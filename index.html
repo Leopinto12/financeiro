@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>NEXUS FINANCIAL | V3</title>
+    <title>NEXUS FINANCIAL | V3.1</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -300,7 +300,7 @@
         let db = { transactions: JSON.parse(localStorage.getItem('nexus_transactions')) || [], goals: JSON.parse(localStorage.getItem('nexus_goals')) || [] };
         let state = { 
             privacyMode: false,
-            currentViewDate: new Date() // Data para o Dashboard
+            currentViewDate: new Date()
         };
         let charts = { main: null, donut: null };
         const monthsStr = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
@@ -371,7 +371,7 @@
             togglePrivacyUI();
         }
 
-        // --- 3. LANÇAMENTOS E PARCELAMENTO ---
+        // --- 3. LANÇAMENTOS E PARCELAMENTO (ATUALIZADO) ---
         function toggleInstallmentOption() {
             const type = document.getElementById('t-type').value;
             const wrap = document.getElementById('installment-wrapper');
@@ -403,20 +403,19 @@
             const installments = isInstallment ? parseInt(document.getElementById('t-installments').value) : 1;
 
             if (isInstallment && type === 'expense' && installments > 1) {
-                // LÓGICA DE PARCELAMENTO
-                const installmentValue = parseFloat((totalAmount / installments).toFixed(2)); // Arredondamento simples
-                const baseDate = new Date(dateStr); // Data da primeira parcela
+                // LÓGICA DE PARCELAMENTO CORRIGIDA COM GRUPO
+                const installmentValue = parseFloat((totalAmount / installments).toFixed(2));
+                const baseDate = new Date(dateStr);
+                const groupId = Date.now().toString(); // ID do Grupo
 
                 for (let i = 0; i < installments; i++) {
-                    // Calcula data: soma 'i' meses
                     const nextDate = new Date(baseDate);
                     nextDate.setMonth(baseDate.getMonth() + i);
-                    
-                    // Ajuste visual da data
                     const finalDateStr = nextDate.toISOString().split('T')[0];
 
                     db.transactions.push({
-                        id: Date.now() + i, // ID único
+                        id: Date.now() + i,
+                        groupId: groupId, // Vincula todas
                         entity: entity,
                         description: `${desc} (${i+1}/${installments})`,
                         amount: installmentValue,
@@ -425,10 +424,8 @@
                         date: finalDateStr
                     });
                 }
-                alert(`Sucesso! ${installments} parcelas de ${fmt(installmentValue)} geradas.`);
-
+                alert(`Sucesso! ${installments} parcelas geradas.`);
             } else {
-                // LANÇAMENTO ÚNICO
                 db.transactions.push({ 
                     id: Date.now(), 
                     entity: entity, 
@@ -443,16 +440,26 @@
             saveDB();
             closeModal('modal-transaction');
             e.target.reset();
-            // Reseta UI do modal
             document.getElementById('is-installment').checked = false;
             toggleInstallmentInput();
         }
 
+        // EXCLUSÃO INTELIGENTE (NOVO)
         function deleteTransaction(id) { 
-            if(confirm('Apagar registro?')) { 
-                db.transactions = db.transactions.filter(t => t.id !== id); 
-                saveDB(); 
-            } 
+            const tx = db.transactions.find(t => t.id === id);
+            if (!tx) return;
+
+            if (tx.groupId) {
+                if(confirm('Este item é parcelado. Apagar TODAS as parcelas restantes?')) {
+                    db.transactions = db.transactions.filter(t => t.groupId !== tx.groupId);
+                    saveDB();
+                }
+            } else {
+                if(confirm('Apagar registro?')) { 
+                    db.transactions = db.transactions.filter(t => t.id !== id); 
+                    saveDB(); 
+                } 
+            }
         }
 
         // --- 4. BACKUP, EXPORT, FILTROS ---
@@ -501,11 +508,9 @@
 
         function updateCharts(tr, cats) {
             if(charts.main) charts.main.destroy(); if(charts.donut) charts.donut.destroy();
-            // Chart Main (Mostra fluxo geral, não só do mês, para ver evolução)
             const vals = db.transactions.sort((a,b)=> new Date(a.date)-new Date(b.date)).slice(-15).map(t => t.type==='income'?t.amount : -t.amount);
             charts.main = new ApexCharts(document.querySelector("#chart-main"), { series: [{name:'Fluxo', data:vals}], chart:{type:'area', height:300, toolbar:{show:false}, background:'transparent'}, colors:['#6366f1'], stroke:{curve:'smooth', width:2}, fill:{type:'gradient', gradient:{shadeIntensity:1, opacityFrom:0.4, opacityTo:0.05}}, dataLabels:{enabled:false}, grid:{borderColor:'rgba(255,255,255,0.05)'}, xaxis:{labels:{show:false}, axisBorder:{show:false}, axisTicks:{show:false}}, yaxis:{show:false}, theme:{mode:'dark'} });
             charts.main.render();
-            // Donut (Baseado no filtro do Mês)
             const cvals = Object.values(cats), clabs = Object.keys(cats);
             charts.donut = new ApexCharts(document.querySelector("#chart-donut"), { series: cvals.length?cvals:[1], labels:cvals.length?clabs:['Vazio'], chart:{type:'donut', height:300, background:'transparent'}, colors:['#6366f1', '#a855f7', '#ec4899', '#10b981', '#f59e0b'], stroke:{show:false}, plotOptions:{pie:{donut:{size:'70%'}}}, dataLabels:{enabled:false}, legend:{position:'bottom', labels:{colors:'#888'}} });
             charts.donut.render();
