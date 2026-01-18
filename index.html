@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>NEXUS FINANCIAL | Cloud-Local</title>
+    <title>NEXUS FINANCIAL | V3</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -59,6 +59,10 @@
         .animate-enter { animation: fadeIn 0.4s ease-out forwards; }
         .blur-sm { filter: blur(8px); transition: 0.3s; }
         .blur-sm:hover { filter: blur(4px); }
+        
+        /* Checkbox Switch Personalizado */
+        .toggle-checkbox:checked { right: 0; border-color: #6366f1; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #6366f1; }
     </style>
 </head>
 <body class="min-h-screen flex overflow-hidden">
@@ -67,7 +71,7 @@
         <div>
             <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-white/5">
                 <i class="ph-fill ph-hexagon text-3xl text-primary"></i>
-                <span class="hidden lg:block ml-3 font-bold text-xl tracking-tight">NEXUS<span class="text-primary">.FIN</span></span>
+                <span class="hidden lg:block ml-3 font-bold text-xl tracking-tight">NEXUS<span class="text-primary">.V3</span></span>
             </div>
 
             <nav class="mt-8 px-4 space-y-2">
@@ -88,10 +92,8 @@
         
         <div class="p-4 border-t border-white/5 space-y-2">
             <button onclick="triggerDataInput()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white p-3 rounded-xl shadow-lg shadow-indigo-900/20 transition-transform active:scale-95 flex items-center justify-center gap-2 font-bold mb-4">
-                <i class="ph-bold ph-plus"></i>
-                <span class="hidden lg:block text-sm">Lançar</span>
+                <i class="ph-bold ph-plus"></i> <span class="hidden lg:block text-sm">Lançar</span>
             </button>
-            
             <button onclick="exportJSON()" class="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-xs font-bold text-gray-500 hover:bg-white/5 hover:text-white transition uppercase tracking-wide">
                 <i class="ph-bold ph-floppy-disk"></i> <span class="hidden lg:inline">Backup</span>
             </button>
@@ -116,19 +118,29 @@
         <div class="p-4 lg:p-8 pb-32 max-w-7xl mx-auto">
 
             <div id="view-dashboard" class="view-section animate-enter">
+                
+                <div class="flex items-center justify-center mb-8 gap-6 glass-panel p-3 rounded-2xl w-fit mx-auto border border-indigo-500/30 shadow-lg shadow-indigo-500/10">
+                    <button onclick="changeDashboardMonth(-1)" class="w-10 h-10 rounded-xl hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition"><i class="ph-bold ph-caret-left text-xl"></i></button>
+                    <div class="text-center min-w-[150px]">
+                        <p class="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">RESUMO DE</p>
+                        <h3 id="current-month-display" class="text-xl font-bold text-white uppercase tracking-wide">JANEIRO 2026</h3>
+                    </div>
+                    <button onclick="changeDashboardMonth(1)" class="w-10 h-10 rounded-xl hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition"><i class="ph-bold ph-caret-right text-xl"></i></button>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
                         <div class="absolute -right-6 -top-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all"></div>
-                        <p class="text-sm text-gray-400 font-medium mb-1">Saldo Total</p>
+                        <p class="text-sm text-gray-400 font-medium mb-1">Resultado do Mês</p>
                         <h3 class="text-3xl font-bold text-white private-data" id="dash-balance">R$ 0,00</h3>
-                        <div class="mt-4 flex items-center gap-2 text-xs text-indigo-400 font-medium bg-indigo-500/10 w-fit px-2 py-1 rounded-md"><i class="ph-fill ph-wallet"></i> Principal</div>
+                        <div class="mt-4 flex items-center gap-2 text-xs text-indigo-400 font-medium bg-indigo-500/10 w-fit px-2 py-1 rounded-md"><i class="ph-fill ph-calendar"></i> Balanço Mensal</div>
                     </div>
                     <div class="glass-panel p-6 rounded-2xl border-l-4 border-success relative">
-                        <p class="text-sm text-gray-400 font-medium mb-1">Entradas (Mês)</p>
+                        <p class="text-sm text-gray-400 font-medium mb-1">Entradas</p>
                         <h3 class="text-2xl font-bold text-white private-data" id="dash-income">R$ 0,00</h3>
                     </div>
                     <div class="glass-panel p-6 rounded-2xl border-l-4 border-danger relative">
-                        <p class="text-sm text-gray-400 font-medium mb-1">Saídas (Mês)</p>
+                        <p class="text-sm text-gray-400 font-medium mb-1">Saídas</p>
                         <h3 class="text-2xl font-bold text-white private-data" id="dash-expense">R$ 0,00</h3>
                         <div class="mt-4 w-full bg-gray-800 h-1 rounded-full overflow-hidden"><div class="bg-danger h-full" id="expense-bar" style="width: 0%"></div></div>
                     </div>
@@ -136,23 +148,23 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <div class="glass-panel p-6 rounded-2xl lg:col-span-2">
-                        <h4 class="font-bold text-lg mb-6">Fluxo Financeiro</h4>
+                        <h4 class="font-bold text-lg mb-6">Fluxo Financeiro (Anual)</h4>
                         <div id="chart-main" class="w-full h-[300px]"></div>
                     </div>
                     <div class="glass-panel p-6 rounded-2xl flex flex-col">
-                        <h4 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="ph-fill ph-storefront text-primary"></i> Top Gastos</h4>
+                        <h4 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="ph-fill ph-storefront text-primary"></i> Top Credores (Mês)</h4>
                         <div id="creditor-list" class="flex-1 overflow-y-auto custom-scroll space-y-3 max-h-[250px]"></div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="glass-panel p-6 rounded-2xl">
-                        <h4 class="font-bold text-lg mb-6">Categorias</h4>
+                        <h4 class="font-bold text-lg mb-6">Categorias (Mês)</h4>
                         <div id="chart-donut" class="w-full h-[300px] flex items-center justify-center"></div>
                     </div>
                     <div class="glass-panel rounded-2xl overflow-hidden">
                         <div class="p-6 border-b border-white/5 flex justify-between items-center">
-                            <h4 class="font-bold">Recentes</h4>
+                            <h4 class="font-bold">Recentes neste Mês</h4>
                             <button onclick="router('extrato')" class="text-xs text-primary font-bold uppercase tracking-wide hover:underline">Ver Todos</button>
                         </div>
                         <div id="recent-list" class="divide-y divide-white/5"></div>
@@ -168,7 +180,7 @@
                             <div class="flex-1"><label class="text-xs text-gray-500 font-bold uppercase mb-1 block">Até</label><input type="date" id="filter-end" class="input-dark w-full p-2.5 rounded-lg text-sm" onchange="applyFilters()"></div>
                             <div class="flex-1"><label class="text-xs text-gray-500 font-bold uppercase mb-1 block">Tipo</label><select id="filter-type" class="input-dark w-full p-2.5 rounded-lg text-sm" onchange="applyFilters()"><option value="all">Todos</option><option value="income">Entradas</option><option value="expense">Saídas</option></select></div>
                         </div>
-                        <button onclick="exportCSV()" class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold border border-white/10 flex items-center gap-2 transition whitespace-nowrap"><i class="ph-bold ph-download-simple"></i> CSV</button>
+                        <button onclick="exportCSV()" class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold border border-white/10 flex items-center gap-2 transition whitespace-nowrap shadow-lg"><i class="ph-bold ph-download-simple"></i> Baixar CSV</button>
                     </div>
                 </div>
 
@@ -186,7 +198,7 @@
                         </thead>
                         <tbody id="extract-table-body" class="text-sm divide-y divide-white/5"></tbody>
                     </table>
-                    <div id="empty-state" class="hidden p-12 text-center text-gray-500"><p>Nenhum registro.</p></div>
+                    <div id="empty-state" class="hidden p-12 text-center text-gray-500"><p>Nenhum registro encontrado.</p></div>
                 </div>
             </div>
 
@@ -202,19 +214,58 @@
     </main>
 
     <div id="modal-transaction" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative animate-enter">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-indigo-500/20 shadow-2xl relative animate-enter">
             <button onclick="closeModal('modal-transaction')" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="ph-bold ph-x"></i></button>
             <h3 class="text-xl font-bold mb-6 text-white">Novo Lançamento</h3>
+            
             <form id="form-transaction" onsubmit="addTransaction(event)" class="space-y-4">
-                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Empresa / Credor</label><input type="text" id="t-entity" class="input-dark w-full p-3 rounded-xl border-l-4 border-l-primary" placeholder="Ex: Nubank, Mercado Livre"></div>
-                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Descrição</label><input type="text" id="t-desc" required class="input-dark w-full p-3 rounded-xl"></div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Valor</label><input type="number" step="0.01" id="t-amount" required class="input-dark w-full p-3 rounded-xl"></div>
-                    <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo</label><select id="t-type" class="input-dark w-full p-3 rounded-xl"><option value="expense">💸 Saída</option><option value="income">💰 Entrada</option></select></div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Empresa / Credor</label>
+                    <input type="text" id="t-entity" class="input-dark w-full p-3 rounded-xl border-l-4 border-l-primary" placeholder="Ex: Nubank, Mercado Livre">
                 </div>
-                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Categoria</label><select id="t-cat" class="input-dark w-full p-3 rounded-xl"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Moradia">Moradia</option><option value="Salário">Salário</option><option value="Investimento">Investimento</option><option value="Contas">Contas</option><option value="Cartão">Cartão</option><option value="Outros">Outros</option></select></div>
-                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Data</label><input type="date" id="t-date" required class="input-dark w-full p-3 rounded-xl"></div>
-                <button type="submit" class="w-full bg-primary hover:bg-indigo-600 text-white font-bold p-3 rounded-xl mt-4">Salvar</button>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Descrição</label>
+                    <input type="text" id="t-desc" required class="input-dark w-full p-3 rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Valor Total</label>
+                        <input type="number" step="0.01" id="t-amount" required class="input-dark w-full p-3 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo</label>
+                        <select id="t-type" class="input-dark w-full p-3 rounded-xl" onchange="toggleInstallmentOption()">
+                            <option value="expense">💸 Saída</option>
+                            <option value="income">💰 Entrada</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="installment-wrapper" class="bg-white/5 p-3 rounded-xl border border-white/5">
+                    <div class="flex items-center justify-between">
+                        <label for="is-installment" class="text-sm font-bold text-gray-300">É parcelado?</label>
+                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" id="is-installment" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" onclick="toggleInstallmentInput()"/>
+                            <label for="is-installment" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-700 cursor-pointer"></label>
+                        </div>
+                    </div>
+                    <div id="installment-inputs" class="hidden mt-3">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nº de Parcelas</label>
+                        <input type="number" id="t-installments" class="input-dark w-full p-2 rounded-lg text-sm" min="2" value="2" placeholder="Ex: 10">
+                        <p class="text-[10px] text-gray-400 mt-1">O valor será dividido automaticamente.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Categoria</label>
+                    <select id="t-cat" class="input-dark w-full p-3 rounded-xl"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Moradia">Moradia</option><option value="Salário">Salário</option><option value="Investimento">Investimento</option><option value="Contas">Contas</option><option value="Cartão">Cartão de Crédito</option><option value="Outros">Outros</option></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Data (1ª Parcela)</label>
+                    <input type="date" id="t-date" required class="input-dark w-full p-3 rounded-xl">
+                </div>
+                
+                <button type="submit" class="w-full bg-primary hover:bg-indigo-600 text-white font-bold p-3 rounded-xl mt-4">Confirmar Lançamento</button>
             </form>
         </div>
     </div>
@@ -245,79 +296,182 @@
     </div>
 
     <script>
+        // --- 1. CONFIGURAÇÃO & ESTADO ---
         let db = { transactions: JSON.parse(localStorage.getItem('nexus_transactions')) || [], goals: JSON.parse(localStorage.getItem('nexus_goals')) || [] };
-        let privacyMode = false;
+        let state = { 
+            privacyMode: false,
+            currentViewDate: new Date() // Data para o Dashboard
+        };
         let charts = { main: null, donut: null };
+        const monthsStr = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
         window.onload = () => { initDates(); updateDashboard(); applyFilters(); renderGoals(); };
         function saveDB() { localStorage.setItem('nexus_transactions', JSON.stringify(db.transactions)); localStorage.setItem('nexus_goals', JSON.stringify(db.goals)); updateDashboard(); applyFilters(); renderGoals(); }
 
-        // --- SISTEMA DE BACKUP JSON ---
-        function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "nexus_backup_" + new Date().toISOString().slice(0,10) + ".json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
+        // --- 2. DASHBOARD COM NAVEGAÇÃO DE MÊS ---
+        function changeDashboardMonth(dir) {
+            state.currentViewDate.setMonth(state.currentViewDate.getMonth() + dir);
+            updateDashboard();
         }
 
-        function importJSON(event) {
-            const fileObj = event.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if(data.transactions && data.goals) {
-                        db = data;
-                        saveDB();
-                        alert("Backup restaurado com sucesso!");
-                    } else { alert("Arquivo inválido."); }
-                } catch(error) { alert("Erro ao ler arquivo."); }
-            };
-            reader.readAsText(fileObj);
-        }
-
-        // --- LÓGICA CORE ---
         function updateDashboard() {
-            const cm = new Date().getMonth(), cy = new Date().getFullYear();
+            const viewMonth = state.currentViewDate.getMonth();
+            const viewYear = state.currentViewDate.getFullYear();
+
+            // Atualiza Título do Mês
+            document.getElementById('current-month-display').innerText = `${monthsStr[viewMonth]} ${viewYear}`;
+
             let bal = 0, inc = 0, exp = 0, cats = {}, creds = {};
+
+            // Ordena
             db.transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
+
             db.transactions.forEach(t => {
-                const v = parseFloat(t.amount), d = new Date(t.date);
-                if(t.type === 'income') bal += v; else bal -= v;
-                if(d.getMonth() === cm && d.getFullYear() === cy) {
-                    if(t.type === 'income') inc += v; else { exp += v; cats[t.category] = (cats[t.category]||0) + v; const ent = t.entity ? t.entity.trim() : 'Outros'; creds[ent] = (creds[ent]||0)+v; }
+                const val = parseFloat(t.amount), d = new Date(t.date);
+                
+                // Filtro do Mês para Dashboard
+                if(d.getMonth() === viewMonth && d.getFullYear() === viewYear) {
+                    if(t.type === 'income') {
+                        bal += val; 
+                        inc += val; 
+                    } else { 
+                        bal -= val; 
+                        exp += val; 
+                        cats[t.category] = (cats[t.category]||0) + val; 
+                        const ent = t.entity ? t.entity.trim() : 'Outros'; 
+                        creds[ent] = (creds[ent]||0)+val; 
+                    }
                 }
             });
-            document.getElementById('dash-balance').innerText = fmt(bal); document.getElementById('dash-income').innerText = fmt(inc); document.getElementById('dash-expense').innerText = fmt(exp);
+
+            // UI
+            document.getElementById('dash-balance').innerText = fmt(bal);
+            if(bal < 0) document.getElementById('dash-balance').classList.add('text-danger');
+            else document.getElementById('dash-balance').classList.remove('text-danger');
+
+            document.getElementById('dash-income').innerText = fmt(inc);
+            document.getElementById('dash-expense').innerText = fmt(exp);
             document.getElementById('expense-bar').style.width = inc > 0 ? `${Math.min((exp/inc)*100, 100)}%` : (exp > 0 ? '100%' : '0%');
             
+            // Credores
             const clist = document.getElementById('creditor-list');
             const sortedC = Object.entries(creds).sort(([,a],[,b])=>b-a).slice(0,10);
-            clist.innerHTML = sortedC.length ? sortedC.map(([n,v],i)=>`<div class="flex justify-between p-2 bg-white/5 rounded border border-white/5"><span class="text-xs text-gray-400">#${i+1} ${n}</span><span class="text-xs font-bold text-danger private-data">${fmt(v)}</span></div>`).join('') : '<p class="text-xs text-gray-500 italic">Sem dados.</p>';
+            clist.innerHTML = sortedC.length ? sortedC.map(([n,v],i)=>`<div class="flex justify-between p-2 bg-white/5 rounded border border-white/5"><span class="text-xs text-gray-400">#${i+1} ${n}</span><span class="text-xs font-bold text-danger private-data">${fmt(v)}</span></div>`).join('') : '<p class="text-xs text-gray-500 italic">Sem dados neste mês.</p>';
+
+            // Recentes (Filtrado pelo mês tbm)
+            const recentMonthData = db.transactions.filter(t => {
+                const d = new Date(t.date);
+                return d.getMonth() === viewMonth && d.getFullYear() === viewYear;
+            }).slice(0, 5);
 
             const rlist = document.getElementById('recent-list');
-            rlist.innerHTML = db.transactions.slice(0,5).map(t => `<div class="p-4 flex justify-between items-center border-b border-white/5 last:border-0 hover:bg-white/5"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800 border border-white/5">${getCategoryIcon(t.category)}</div><div><p class="font-bold text-sm text-white">${t.description}</p><p class="text-[10px] text-gray-400">${t.entity?t.entity+' • ':''}${fmtDate(t.date)}</p></div></div><span class="font-bold text-sm ${t.type==='income'?'text-success':'text-white'} private-data">${t.type==='income'?'+':'-'} ${fmt(t.amount)}</span></div>`).join('');
+            rlist.innerHTML = recentMonthData.length ? recentMonthData.map(t => `<div class="p-4 flex justify-between items-center border-b border-white/5 last:border-0 hover:bg-white/5"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800 border border-white/5">${getCategoryIcon(t.category)}</div><div><p class="font-bold text-sm text-white">${t.description}</p><p class="text-[10px] text-gray-400">${t.entity?t.entity+' • ':''}${fmtDate(t.date)}</p></div></div><span class="font-bold text-sm ${t.type==='income'?'text-success':'text-white'} private-data">${t.type==='income'?'+':'-'} ${fmt(t.amount)}</span></div>`).join('') : '<p class="p-4 text-xs text-gray-500 text-center">Nenhuma movimentação.</p>';
             
-            updateCharts(db.transactions, cats);
+            updateCharts(db.transactions, cats); // Gráfico Anual vs Mensal (categorias)
             togglePrivacyUI();
         }
 
-        // --- TRANSAÇÕES ---
-        function addTransaction(e) { e.preventDefault(); db.transactions.push({ id: Date.now(), entity: document.getElementById('t-entity').value, description: document.getElementById('t-desc').value, amount: parseFloat(document.getElementById('t-amount').value), type: document.getElementById('t-type').value, category: document.getElementById('t-cat').value, date: document.getElementById('t-date').value }); saveDB(); closeModal('modal-transaction'); e.target.reset(); }
-        function deleteTransaction(id) { if(confirm('Apagar?')) { db.transactions = db.transactions.filter(t => t.id !== id); saveDB(); } }
-        
-        // --- CSV ---
+        // --- 3. LANÇAMENTOS E PARCELAMENTO ---
+        function toggleInstallmentOption() {
+            const type = document.getElementById('t-type').value;
+            const wrap = document.getElementById('installment-wrapper');
+            if(type === 'income') {
+                wrap.classList.add('hidden');
+                document.getElementById('is-installment').checked = false;
+                toggleInstallmentInput();
+            } else {
+                wrap.classList.remove('hidden');
+            }
+        }
+
+        function toggleInstallmentInput() {
+            const chk = document.getElementById('is-installment').checked;
+            const div = document.getElementById('installment-inputs');
+            if(chk) div.classList.remove('hidden'); else div.classList.add('hidden');
+        }
+
+        function addTransaction(e) {
+            e.preventDefault();
+            
+            const entity = document.getElementById('t-entity').value;
+            const desc = document.getElementById('t-desc').value;
+            const totalAmount = parseFloat(document.getElementById('t-amount').value);
+            const type = document.getElementById('t-type').value;
+            const cat = document.getElementById('t-cat').value;
+            const dateStr = document.getElementById('t-date').value;
+            const isInstallment = document.getElementById('is-installment').checked;
+            const installments = isInstallment ? parseInt(document.getElementById('t-installments').value) : 1;
+
+            if (isInstallment && type === 'expense' && installments > 1) {
+                // LÓGICA DE PARCELAMENTO
+                const installmentValue = parseFloat((totalAmount / installments).toFixed(2)); // Arredondamento simples
+                const baseDate = new Date(dateStr); // Data da primeira parcela
+
+                for (let i = 0; i < installments; i++) {
+                    // Calcula data: soma 'i' meses
+                    const nextDate = new Date(baseDate);
+                    nextDate.setMonth(baseDate.getMonth() + i);
+                    
+                    // Ajuste visual da data
+                    const finalDateStr = nextDate.toISOString().split('T')[0];
+
+                    db.transactions.push({
+                        id: Date.now() + i, // ID único
+                        entity: entity,
+                        description: `${desc} (${i+1}/${installments})`,
+                        amount: installmentValue,
+                        type: type,
+                        category: cat,
+                        date: finalDateStr
+                    });
+                }
+                alert(`Sucesso! ${installments} parcelas de ${fmt(installmentValue)} geradas.`);
+
+            } else {
+                // LANÇAMENTO ÚNICO
+                db.transactions.push({ 
+                    id: Date.now(), 
+                    entity: entity, 
+                    description: desc, 
+                    amount: totalAmount, 
+                    type: type, 
+                    category: cat, 
+                    date: dateStr 
+                });
+            }
+
+            saveDB();
+            closeModal('modal-transaction');
+            e.target.reset();
+            // Reseta UI do modal
+            document.getElementById('is-installment').checked = false;
+            toggleInstallmentInput();
+        }
+
+        function deleteTransaction(id) { 
+            if(confirm('Apagar registro?')) { 
+                db.transactions = db.transactions.filter(t => t.id !== id); 
+                saveDB(); 
+            } 
+        }
+
+        // --- 4. BACKUP, EXPORT, FILTROS ---
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+            const a = document.createElement('a'); a.href = dataStr; a.download = "nexus_bkp_" + new Date().toISOString().slice(0,10) + ".json"; document.body.appendChild(a); a.click(); a.remove();
+        }
+        function importJSON(event) {
+            const reader = new FileReader();
+            reader.onload = (e) => { try { db = JSON.parse(e.target.result); saveDB(); alert("Restaurado!"); } catch(err) { alert("Erro!"); } };
+            reader.readAsText(event.target.files[0]);
+        }
         function exportCSV() {
             const start = document.getElementById('filter-start').value, end = document.getElementById('filter-end').value, type = document.getElementById('filter-type').value;
             const filtered = db.transactions.filter(t => (!start || t.date >= start) && (!end || t.date <= end) && (type === 'all' || t.type === type));
             if(!filtered.length) return alert("Nada para exportar.");
-            let csv = "data:text/csv;charset=utf-8,\uFEFFData;Empresa;Descrição;Categoria;Tipo;Valor\n" + filtered.map(t => `${fmtDate(t.date)};${t.entity||'-'};${t.description};${t.category};${t.type};${t.amount.toFixed(2).replace('.',',')}`).join('\n');
-            const a = document.createElement('a'); a.href = encodeURI(csv); a.download = `extrato_${start||'ini'}_${end||'fim'}.csv`; document.body.appendChild(a); a.click(); a.remove();
+            let csv = "data:text/csv;charset=utf-8,\uFEFFData;Credor;Descrição;Categoria;Tipo;Valor\n" + filtered.map(t => `${fmtDate(t.date)};${t.entity||'-'};${t.description};${t.category};${t.type};${t.amount.toFixed(2).replace('.',',')}`).join('\n');
+            const a = document.createElement('a'); a.href = encodeURI(csv); a.download = "extrato.csv"; document.body.appendChild(a); a.click(); a.remove();
         }
-
         function applyFilters() {
             const start = document.getElementById('filter-start').value, end = document.getElementById('filter-end').value, type = document.getElementById('filter-type').value;
             const filtered = db.transactions.filter(t => (!start || t.date >= start) && (!end || t.date <= end) && (type === 'all' || t.type === type));
@@ -326,8 +480,7 @@
             togglePrivacyUI();
         }
 
-        // --- CAIXINHAS (GOALS) ---
-        function openGoalModal() { openModal('modal-goal'); }
+        // --- 5. CAIXINHAS & OUTROS ---
         function addGoal(e) { e.preventDefault(); db.goals.push({ id: Date.now(), name: document.getElementById('g-name').value, target: parseFloat(document.getElementById('g-target').value), current: parseFloat(document.getElementById('g-current').value)||0 }); saveDB(); closeModal('modal-goal'); e.target.reset(); }
         function renderGoals() {
             const c = document.getElementById('goals-grid'); c.innerHTML = '';
@@ -346,23 +499,25 @@
         }
         function deleteGoal(id) { if(confirm('Excluir?')) { db.goals = db.goals.filter(g => g.id !== id); saveDB(); } }
 
-        // --- CHARTS & UTILS ---
         function updateCharts(tr, cats) {
             if(charts.main) charts.main.destroy(); if(charts.donut) charts.donut.destroy();
-            const vals = tr.slice(0,15).reverse().map(t => t.type==='income'?t.amount : -t.amount);
+            // Chart Main (Mostra fluxo geral, não só do mês, para ver evolução)
+            const vals = db.transactions.sort((a,b)=> new Date(a.date)-new Date(b.date)).slice(-15).map(t => t.type==='income'?t.amount : -t.amount);
             charts.main = new ApexCharts(document.querySelector("#chart-main"), { series: [{name:'Fluxo', data:vals}], chart:{type:'area', height:300, toolbar:{show:false}, background:'transparent'}, colors:['#6366f1'], stroke:{curve:'smooth', width:2}, fill:{type:'gradient', gradient:{shadeIntensity:1, opacityFrom:0.4, opacityTo:0.05}}, dataLabels:{enabled:false}, grid:{borderColor:'rgba(255,255,255,0.05)'}, xaxis:{labels:{show:false}, axisBorder:{show:false}, axisTicks:{show:false}}, yaxis:{show:false}, theme:{mode:'dark'} });
             charts.main.render();
+            // Donut (Baseado no filtro do Mês)
             const cvals = Object.values(cats), clabs = Object.keys(cats);
             charts.donut = new ApexCharts(document.querySelector("#chart-donut"), { series: cvals.length?cvals:[1], labels:cvals.length?clabs:['Vazio'], chart:{type:'donut', height:300, background:'transparent'}, colors:['#6366f1', '#a855f7', '#ec4899', '#10b981', '#f59e0b'], stroke:{show:false}, plotOptions:{pie:{donut:{size:'70%'}}}, dataLabels:{enabled:false}, legend:{position:'bottom', labels:{colors:'#888'}} });
             charts.donut.render();
         }
 
+        // Utils
         function fmt(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
         function fmtDate(d) { return d.split('-').reverse().join('/'); }
         function initDates() { const t=new Date(); document.getElementById('t-date').value=t.toISOString().split('T')[0]; document.getElementById('filter-end').value=t.toISOString().split('T')[0]; document.getElementById('filter-start').value=new Date(t.getFullYear(), t.getMonth(), 1).toISOString().split('T')[0]; }
         function router(v) { document.querySelectorAll('.view-section').forEach(e=>{e.classList.add('hidden');e.classList.remove('animate-enter')}); const a=document.getElementById(`view-${v}`); a.classList.remove('hidden'); void a.offsetWidth; a.classList.add('animate-enter'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('bg-white/5','text-white')); document.getElementById(`btn-${v}`).classList.add('bg-white/5','text-white'); document.getElementById('page-title').innerText={'dashboard':'Visão Geral','extrato':'Extrato','caixinhas':'Metas'}[v]; }
-        function togglePrivacy() { privacyMode=!privacyMode; document.getElementById('eye-icon').className=privacyMode?'ph-fill ph-eye-slash':'ph ph-eye'; togglePrivacyUI(); }
-        function togglePrivacyUI() { document.querySelectorAll('.private-data').forEach(e=>privacyMode?e.classList.add('blur-sm'):e.classList.remove('blur-sm')); }
+        function togglePrivacy() { state.privacyMode=!state.privacyMode; document.getElementById('eye-icon').className=state.privacyMode?'ph-fill ph-eye-slash':'ph ph-eye'; togglePrivacyUI(); }
+        function togglePrivacyUI() { document.querySelectorAll('.private-data').forEach(e=>state.privacyMode?e.classList.add('blur-sm'):e.classList.remove('blur-sm')); }
         function triggerDataInput() { document.getElementById('t-date').value=new Date().toISOString().split('T')[0]; openModal('modal-transaction'); }
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
