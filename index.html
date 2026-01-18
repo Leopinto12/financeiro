@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>NEXUS FINANCIAL | V3.1</title>
+    <title>NEXUS FINANCIAL | V3.3 (Blindada)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -324,6 +324,7 @@
             let bal = 0, inc = 0, exp = 0, cats = {}, creds = {};
 
             // Ordena
+            if(!Array.isArray(db.transactions)) db.transactions = [];
             db.transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
 
             db.transactions.forEach(t => {
@@ -371,7 +372,7 @@
             togglePrivacyUI();
         }
 
-        // --- 3. LANÇAMENTOS E PARCELAMENTO (ATUALIZADO) ---
+        // --- 3. LANÇAMENTOS E PARCELAMENTO (CORRIGIDO E BLINDADO) ---
         function toggleInstallmentOption() {
             const type = document.getElementById('t-type').value;
             const wrap = document.getElementById('installment-wrapper');
@@ -393,73 +394,114 @@
         function addTransaction(e) {
             e.preventDefault();
             
-            const entity = document.getElementById('t-entity').value;
-            const desc = document.getElementById('t-desc').value;
-            const totalAmount = parseFloat(document.getElementById('t-amount').value);
-            const type = document.getElementById('t-type').value;
-            const cat = document.getElementById('t-cat').value;
-            const dateStr = document.getElementById('t-date').value;
-            const isInstallment = document.getElementById('is-installment').checked;
-            const installments = isInstallment ? parseInt(document.getElementById('t-installments').value) : 1;
+            try {
+                // AUTO-CORREÇÃO DE BANCO DE DADOS
+                if(!db.transactions || !Array.isArray(db.transactions)) {
+                    db.transactions = [];
+                }
 
-            if (isInstallment && type === 'expense' && installments > 1) {
-                // LÓGICA DE PARCELAMENTO CORRIGIDA COM GRUPO
-                const installmentValue = parseFloat((totalAmount / installments).toFixed(2));
-                const baseDate = new Date(dateStr);
-                const groupId = Date.now().toString(); // ID do Grupo
+                const entity = document.getElementById('t-entity').value;
+                const desc = document.getElementById('t-desc').value;
+                const totalAmount = parseFloat(document.getElementById('t-amount').value);
+                const type = document.getElementById('t-type').value;
+                const cat = document.getElementById('t-cat').value;
+                const dateStr = document.getElementById('t-date').value;
+                const isInstallment = document.getElementById('is-installment').checked;
+                let installments = parseInt(document.getElementById('t-installments').value);
+                
+                // Proteção para parcelas inválidas
+                if(isNaN(installments) || installments < 1) installments = 1;
 
-                for (let i = 0; i < installments; i++) {
-                    const nextDate = new Date(baseDate);
-                    nextDate.setMonth(baseDate.getMonth() + i);
-                    const finalDateStr = nextDate.toISOString().split('T')[0];
+                if (isInstallment && type === 'expense' && installments > 1) {
+                    // LÓGICA DE PARCELAMENTO CORRIGIDA COM GRUPO
+                    const installmentValue = parseFloat((totalAmount / installments).toFixed(2));
+                    const baseDate = new Date(dateStr);
+                    const groupId = Date.now().toString(); // ID do Grupo
 
-                    db.transactions.push({
-                        id: Date.now() + i,
-                        groupId: groupId, // Vincula todas
-                        entity: entity,
-                        description: `${desc} (${i+1}/${installments})`,
-                        amount: installmentValue,
-                        type: type,
-                        category: cat,
-                        date: finalDateStr
+                    for (let i = 0; i < installments; i++) {
+                        const nextDate = new Date(baseDate);
+                        nextDate.setMonth(baseDate.getMonth() + i);
+                        const finalDateStr = nextDate.toISOString().split('T')[0];
+
+                        db.transactions.push({
+                            id: Date.now() + i,
+                            groupId: groupId, // Vincula todas
+                            entity: entity,
+                            description: `${desc} (${i+1}/${installments})`,
+                            amount: installmentValue,
+                            type: type,
+                            category: cat,
+                            date: finalDateStr
+                        });
+                    }
+                    // Removi o alert que podia travar se o modal não fechasse
+                } else {
+                    db.transactions.push({ 
+                        id: Date.now(), 
+                        entity: entity, 
+                        description: desc, 
+                        amount: totalAmount, 
+                        type: type, 
+                        category: cat, 
+                        date: dateStr 
                     });
                 }
-                alert(`Sucesso! ${installments} parcelas geradas.`);
-            } else {
-                db.transactions.push({ 
-                    id: Date.now(), 
-                    entity: entity, 
-                    description: desc, 
-                    amount: totalAmount, 
-                    type: type, 
-                    category: cat, 
-                    date: dateStr 
-                });
-            }
 
-            saveDB();
-            closeModal('modal-transaction');
-            e.target.reset();
-            document.getElementById('is-installment').checked = false;
-            toggleInstallmentInput();
+                saveDB();
+                closeModal('modal-transaction');
+                e.target.reset();
+                document.getElementById('is-installment').checked = false;
+                toggleInstallmentInput();
+
+            } catch (error) {
+                alert("Erro ao lançar: " + error.message + ". Tente recarregar a página.");
+                console.error(error);
+            }
         }
 
-        // EXCLUSÃO INTELIGENTE (NOVO)
+        // --- LIXEIRA INTELIGENTE (SMART DELETE) ---
         function deleteTransaction(id) { 
             const tx = db.transactions.find(t => t.id === id);
             if (!tx) return;
 
+            // CENÁRIO 1: Lançamentos Novos (que já têm o ID de grupo)
             if (tx.groupId) {
                 if(confirm('Este item é parcelado. Apagar TODAS as parcelas restantes?')) {
                     db.transactions = db.transactions.filter(t => t.groupId !== tx.groupId);
                     saveDB();
                 }
-            } else {
-                if(confirm('Apagar registro?')) { 
-                    db.transactions = db.transactions.filter(t => t.id !== id); 
-                    saveDB(); 
-                } 
+                return;
+            } 
+            
+            // CENÁRIO 2: Lançamentos Antigos (O "Limpador Inteligente")
+            const isLegacyInstallment = tx.description ? tx.description.match(/(.*?) \(\d+\/\d+\)$/) : null;
+            
+            if (isLegacyInstallment) {
+                const baseName = isLegacyInstallment[1]; 
+                
+                const similarItems = db.transactions.filter(t => 
+                    t.description && 
+                    t.description.includes(baseName) && 
+                    t.description.includes('(') && 
+                    t.description.includes(')') &&
+                    t.entity === tx.entity
+                );
+
+                if (similarItems.length > 1) {
+                    if(confirm(`Detectei ${similarItems.length} parcelas antigas similares a "${baseName}".\nDeseja forçar a exclusão de TODAS elas de uma vez?`)) {
+                        const idsToDelete = similarItems.map(t => t.id);
+                        db.transactions = db.transactions.filter(t => !idsToDelete.includes(t.id));
+                        saveDB();
+                        return;
+                    }
+                }
             }
+
+            // CENÁRIO 3: Exclusão Simples
+            if(confirm('Apagar este registro?')) { 
+                db.transactions = db.transactions.filter(t => t.id !== id); 
+                saveDB(); 
+            } 
         }
 
         // --- 4. BACKUP, EXPORT, FILTROS ---
@@ -517,8 +559,8 @@
         }
 
         // Utils
-        function fmt(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
-        function fmtDate(d) { return d.split('-').reverse().join('/'); }
+        function fmt(v) { return isNaN(v) ? 'R$ 0,00' : v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        function fmtDate(d) { return d ? d.split('-').reverse().join('/') : '-'; }
         function initDates() { const t=new Date(); document.getElementById('t-date').value=t.toISOString().split('T')[0]; document.getElementById('filter-end').value=t.toISOString().split('T')[0]; document.getElementById('filter-start').value=new Date(t.getFullYear(), t.getMonth(), 1).toISOString().split('T')[0]; }
         function router(v) { document.querySelectorAll('.view-section').forEach(e=>{e.classList.add('hidden');e.classList.remove('animate-enter')}); const a=document.getElementById(`view-${v}`); a.classList.remove('hidden'); void a.offsetWidth; a.classList.add('animate-enter'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('bg-white/5','text-white')); document.getElementById(`btn-${v}`).classList.add('bg-white/5','text-white'); document.getElementById('page-title').innerText={'dashboard':'Visão Geral','extrato':'Extrato','caixinhas':'Metas'}[v]; }
         function togglePrivacy() { state.privacyMode=!state.privacyMode; document.getElementById('eye-icon').className=state.privacyMode?'ph-fill ph-eye-slash':'ph ph-eye'; togglePrivacyUI(); }
