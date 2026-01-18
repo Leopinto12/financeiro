@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>NEXUS FINANCIAL | Local</title>
+    <title>NEXUS FINANCIAL | Cloud-Local</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -22,10 +22,10 @@
                         dark: '#050505',
                         surface: '#121212',
                         glass: 'rgba(255, 255, 255, 0.03)',
-                        primary: '#6366f1', // Indigo
-                        accent: '#8b5cf6',  // Roxo
-                        success: '#10b981', // Verde
-                        danger: '#ef4444'   // Vermelho
+                        primary: '#6366f1',
+                        accent: '#8b5cf6',
+                        success: '#10b981',
+                        danger: '#ef4444'
                     }
                 }
             }
@@ -34,8 +34,6 @@
 
     <style>
         body { background-color: #050505; color: #e5e5e5; -webkit-tap-highlight-color: transparent; }
-        
-        /* Efeito de Vidro (Glassmorphism) */
         .glass-panel {
             background: rgba(18, 18, 18, 0.6);
             backdrop-filter: blur(16px);
@@ -43,8 +41,6 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
-
-        /* Inputs Estilizados */
         .input-dark {
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -56,17 +52,11 @@
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
             outline: none;
         }
-
-        /* Scrollbar Fina */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #050505; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        
-        /* Animações de Entrada */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-enter { animation: fadeIn 0.4s ease-out forwards; }
-
-        /* Filtro de Privacidade (Blur) */
         .blur-sm { filter: blur(8px); transition: 0.3s; }
         .blur-sm:hover { filter: blur(4px); }
     </style>
@@ -96,20 +86,27 @@
             </nav>
         </div>
         
-        <div class="p-4 border-t border-white/5">
-            <button onclick="triggerDataInput()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white p-3 rounded-xl shadow-lg shadow-indigo-900/20 transition-transform active:scale-95 flex items-center justify-center gap-2 font-bold">
+        <div class="p-4 border-t border-white/5 space-y-2">
+            <button onclick="triggerDataInput()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white p-3 rounded-xl shadow-lg shadow-indigo-900/20 transition-transform active:scale-95 flex items-center justify-center gap-2 font-bold mb-4">
                 <i class="ph-bold ph-plus"></i>
-                <span class="hidden lg:block text-sm">Novo Lançamento</span>
+                <span class="hidden lg:block text-sm">Lançar</span>
             </button>
+            
+            <button onclick="exportJSON()" class="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-xs font-bold text-gray-500 hover:bg-white/5 hover:text-white transition uppercase tracking-wide">
+                <i class="ph-bold ph-floppy-disk"></i> <span class="hidden lg:inline">Backup</span>
+            </button>
+            <label class="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-xs font-bold text-gray-500 hover:bg-white/5 hover:text-white transition uppercase tracking-wide cursor-pointer">
+                <i class="ph-bold ph-upload"></i> <span class="hidden lg:inline">Restaurar</span>
+                <input type="file" onchange="importJSON(event)" class="hidden" accept=".json">
+            </label>
         </div>
     </aside>
 
     <main class="flex-1 overflow-y-auto relative bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/10 via-dark to-dark">
-        
         <header class="sticky top-0 z-10 glass-panel border-b-0 border-white/5 px-8 py-4 flex justify-between items-center">
             <h2 id="page-title" class="text-2xl font-bold text-white tracking-tight">Visão Geral</h2>
             <div class="flex items-center gap-4">
-                <button onclick="togglePrivacy()" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition text-gray-400" title="Modo Privacidade">
+                <button onclick="togglePrivacy()" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition text-gray-400">
                     <i class="ph ph-eye" id="eye-icon"></i>
                 </button>
                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 border border-white/10 flex items-center justify-center font-bold text-xs shadow-inner">EU</div>
@@ -119,29 +116,21 @@
         <div class="p-4 lg:p-8 pb-32 max-w-7xl mx-auto">
 
             <div id="view-dashboard" class="view-section animate-enter">
-                
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
                         <div class="absolute -right-6 -top-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all"></div>
-                        <p class="text-sm text-gray-400 font-medium mb-1">Saldo Atual</p>
+                        <p class="text-sm text-gray-400 font-medium mb-1">Saldo Total</p>
                         <h3 class="text-3xl font-bold text-white private-data" id="dash-balance">R$ 0,00</h3>
-                        <div class="mt-4 flex items-center gap-2 text-xs text-indigo-400 font-medium bg-indigo-500/10 w-fit px-2 py-1 rounded-md">
-                            <i class="ph-fill ph-wallet"></i> Carteira Principal
-                        </div>
+                        <div class="mt-4 flex items-center gap-2 text-xs text-indigo-400 font-medium bg-indigo-500/10 w-fit px-2 py-1 rounded-md"><i class="ph-fill ph-wallet"></i> Principal</div>
                     </div>
                     <div class="glass-panel p-6 rounded-2xl border-l-4 border-success relative">
                         <p class="text-sm text-gray-400 font-medium mb-1">Entradas (Mês)</p>
                         <h3 class="text-2xl font-bold text-white private-data" id="dash-income">R$ 0,00</h3>
-                         <div class="mt-4 w-full bg-gray-800 h-1 rounded-full overflow-hidden">
-                            <div class="bg-success h-full" style="width: 100%"></div>
-                        </div>
                     </div>
                     <div class="glass-panel p-6 rounded-2xl border-l-4 border-danger relative">
                         <p class="text-sm text-gray-400 font-medium mb-1">Saídas (Mês)</p>
                         <h3 class="text-2xl font-bold text-white private-data" id="dash-expense">R$ 0,00</h3>
-                        <div class="mt-4 w-full bg-gray-800 h-1 rounded-full overflow-hidden">
-                            <div class="bg-danger h-full" id="expense-bar" style="width: 0%"></div>
-                        </div>
+                        <div class="mt-4 w-full bg-gray-800 h-1 rounded-full overflow-hidden"><div class="bg-danger h-full" id="expense-bar" style="width: 0%"></div></div>
                     </div>
                 </div>
 
@@ -150,27 +139,21 @@
                         <h4 class="font-bold text-lg mb-6">Fluxo Financeiro</h4>
                         <div id="chart-main" class="w-full h-[300px]"></div>
                     </div>
-                    
                     <div class="glass-panel p-6 rounded-2xl flex flex-col">
-                        <h4 class="font-bold text-lg mb-4 flex items-center gap-2">
-                            <i class="ph-fill ph-storefront text-primary"></i> Top Gastos/Empresas
-                        </h4>
-                        <p class="text-xs text-gray-500 mb-4">Onde você mais gastou este mês.</p>
-                        <div id="creditor-list" class="flex-1 overflow-y-auto custom-scroll space-y-3 max-h-[250px]">
-                            </div>
+                        <h4 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="ph-fill ph-storefront text-primary"></i> Top Gastos</h4>
+                        <div id="creditor-list" class="flex-1 overflow-y-auto custom-scroll space-y-3 max-h-[250px]"></div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="glass-panel p-6 rounded-2xl">
-                        <h4 class="font-bold text-lg mb-6">Por Categoria</h4>
+                        <h4 class="font-bold text-lg mb-6">Categorias</h4>
                         <div id="chart-donut" class="w-full h-[300px] flex items-center justify-center"></div>
                     </div>
-
                     <div class="glass-panel rounded-2xl overflow-hidden">
                         <div class="p-6 border-b border-white/5 flex justify-between items-center">
-                            <h4 class="font-bold">Últimas Movimentações</h4>
-                            <button onclick="router('extrato')" class="text-xs text-primary font-bold uppercase tracking-wide hover:underline">Ver Extrato Completo</button>
+                            <h4 class="font-bold">Recentes</h4>
+                            <button onclick="router('extrato')" class="text-xs text-primary font-bold uppercase tracking-wide hover:underline">Ver Todos</button>
                         </div>
                         <div id="recent-list" class="divide-y divide-white/5"></div>
                     </div>
@@ -181,26 +164,11 @@
                 <div class="glass-panel p-6 rounded-2xl mb-6">
                     <div class="flex flex-col md:flex-row gap-4 justify-between items-end">
                         <div class="flex flex-col md:flex-row gap-4 w-full">
-                            <div class="flex-1">
-                                <label class="text-xs text-gray-500 font-bold uppercase mb-1 block">De</label>
-                                <input type="date" id="filter-start" class="input-dark w-full p-2.5 rounded-lg text-sm" onchange="applyFilters()">
-                            </div>
-                            <div class="flex-1">
-                                <label class="text-xs text-gray-500 font-bold uppercase mb-1 block">Até</label>
-                                <input type="date" id="filter-end" class="input-dark w-full p-2.5 rounded-lg text-sm" onchange="applyFilters()">
-                            </div>
-                            <div class="flex-1">
-                                <label class="text-xs text-gray-500 font-bold uppercase mb-1 block">Tipo</label>
-                                <select id="filter-type" class="input-dark w-full p-2.5 rounded-lg text-sm" onchange="applyFilters()">
-                                    <option value="all">Todos</option>
-                                    <option value="income">Entradas</option>
-                                    <option value="expense">Saídas</option>
-                                </select>
-                            </div>
+                            <div class="flex-1"><label class="text-xs text-gray-500 font-bold uppercase mb-1 block">De</label><input type="date" id="filter-start" class="input-dark w-full p-2.5 rounded-lg text-sm" onchange="applyFilters()"></div>
+                            <div class="flex-1"><label class="text-xs text-gray-500 font-bold uppercase mb-1 block">Até</label><input type="date" id="filter-end" class="input-dark w-full p-2.5 rounded-lg text-sm" onchange="applyFilters()"></div>
+                            <div class="flex-1"><label class="text-xs text-gray-500 font-bold uppercase mb-1 block">Tipo</label><select id="filter-type" class="input-dark w-full p-2.5 rounded-lg text-sm" onchange="applyFilters()"><option value="all">Todos</option><option value="income">Entradas</option><option value="expense">Saídas</option></select></div>
                         </div>
-                        <button onclick="exportCSV()" class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold border border-white/10 flex items-center gap-2 transition whitespace-nowrap shadow-lg">
-                            <i class="ph-bold ph-download-simple"></i> Baixar CSV (Excel)
-                        </button>
+                        <button onclick="exportCSV()" class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold border border-white/10 flex items-center gap-2 transition whitespace-nowrap"><i class="ph-bold ph-download-simple"></i> CSV</button>
                     </div>
                 </div>
 
@@ -209,26 +177,23 @@
                         <thead>
                             <tr class="bg-white/5 text-gray-400 text-xs uppercase tracking-wider border-b border-white/5">
                                 <th class="p-4 font-semibold">Data</th>
-                                <th class="p-4 font-semibold">Empresa/Credor</th>
+                                <th class="p-4 font-semibold">Credor</th>
                                 <th class="p-4 font-semibold">Descrição</th>
                                 <th class="p-4 font-semibold">Categoria</th>
                                 <th class="p-4 font-semibold text-right">Valor</th>
-                                <th class="p-4 font-semibold text-center">Ações</th>
+                                <th class="p-4 font-semibold text-center">Del</th>
                             </tr>
                         </thead>
                         <tbody id="extract-table-body" class="text-sm divide-y divide-white/5"></tbody>
                     </table>
-                    <div id="empty-state" class="hidden p-12 text-center text-gray-500">
-                        <i class="ph ph-magnifying-glass text-4xl mb-2 opacity-50"></i>
-                        <p>Nenhum registro encontrado.</p>
-                    </div>
+                    <div id="empty-state" class="hidden p-12 text-center text-gray-500"><p>Nenhum registro.</p></div>
                 </div>
             </div>
 
             <div id="view-caixinhas" class="view-section hidden animate-enter">
                 <div class="flex justify-between items-center mb-6">
-                    <p class="text-gray-400 text-sm">Organize suas metas financeiras.</p>
-                    <button onclick="openGoalModal()" class="text-primary text-sm font-bold hover:underline">+ Nova Caixinha</button>
+                    <p class="text-gray-400 text-sm">Metas Financeiras</p>
+                    <button onclick="openGoalModal()" class="text-primary text-sm font-bold hover:underline">+ Nova</button>
                 </div>
                 <div id="goals-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
             </div>
@@ -237,53 +202,19 @@
     </main>
 
     <div id="modal-transaction" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-indigo-500/20 shadow-2xl relative animate-enter">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative animate-enter">
             <button onclick="closeModal('modal-transaction')" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="ph-bold ph-x"></i></button>
-            <h3 class="text-xl font-bold mb-6 text-white">Nova Movimentação</h3>
-            
+            <h3 class="text-xl font-bold mb-6 text-white">Novo Lançamento</h3>
             <form id="form-transaction" onsubmit="addTransaction(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Empresa / Pessoa (Credor)</label>
-                    <input type="text" id="t-entity" class="input-dark w-full p-3 rounded-xl border-l-4 border-l-primary" placeholder="Ex: Nubank, Mercado Livre, Aluguel...">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Descrição</label>
-                    <input type="text" id="t-desc" required class="input-dark w-full p-3 rounded-xl" placeholder="Ex: Compra do Mês">
-                </div>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Empresa / Credor</label><input type="text" id="t-entity" class="input-dark w-full p-3 rounded-xl border-l-4 border-l-primary" placeholder="Ex: Nubank, Mercado Livre"></div>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Descrição</label><input type="text" id="t-desc" required class="input-dark w-full p-3 rounded-xl"></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Valor</label>
-                        <input type="number" step="0.01" id="t-amount" required class="input-dark w-full p-3 rounded-xl" placeholder="0.00">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo</label>
-                        <select id="t-type" class="input-dark w-full p-3 rounded-xl">
-                            <option value="expense">💸 Saída</option>
-                            <option value="income">💰 Entrada</option>
-                        </select>
-                    </div>
+                    <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Valor</label><input type="number" step="0.01" id="t-amount" required class="input-dark w-full p-3 rounded-xl"></div>
+                    <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo</label><select id="t-type" class="input-dark w-full p-3 rounded-xl"><option value="expense">💸 Saída</option><option value="income">💰 Entrada</option></select></div>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Categoria</label>
-                    <select id="t-cat" class="input-dark w-full p-3 rounded-xl">
-                        <option value="Alimentação">Alimentação</option>
-                        <option value="Transporte">Transporte</option>
-                        <option value="Lazer">Lazer</option>
-                        <option value="Moradia">Moradia</option>
-                        <option value="Salário">Salário</option>
-                        <option value="Investimento">Investimento</option>
-                        <option value="Contas">Contas</option>
-                        <option value="Cartão">Cartão de Crédito</option>
-                        <option value="Outros">Outros</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Data</label>
-                    <input type="date" id="t-date" required class="input-dark w-full p-3 rounded-xl">
-                </div>
-                
-                <button type="submit" class="w-full bg-primary hover:bg-indigo-600 text-white font-bold p-3 rounded-xl mt-4 transition shadow-lg shadow-indigo-900/20">Salvar</button>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Categoria</label><select id="t-cat" class="input-dark w-full p-3 rounded-xl"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Moradia">Moradia</option><option value="Salário">Salário</option><option value="Investimento">Investimento</option><option value="Contas">Contas</option><option value="Cartão">Cartão</option><option value="Outros">Outros</option></select></div>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Data</label><input type="date" id="t-date" required class="input-dark w-full p-3 rounded-xl"></div>
+                <button type="submit" class="w-full bg-primary hover:bg-indigo-600 text-white font-bold p-3 rounded-xl mt-4">Salvar</button>
             </form>
         </div>
     </div>
@@ -293,19 +224,10 @@
             <button onclick="closeModal('modal-goal')" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="ph-bold ph-x"></i></button>
             <h3 class="text-xl font-bold mb-6 text-white">Nova Caixinha</h3>
             <form id="form-goal" onsubmit="addGoal(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome da Meta</label>
-                    <input type="text" id="g-name" required class="input-dark w-full p-3 rounded-xl" placeholder="Ex: Viagem, Carro Novo...">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Valor Alvo (Meta)</label>
-                    <input type="number" step="0.01" id="g-target" required class="input-dark w-full p-3 rounded-xl">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Saldo Inicial (Já guardado)</label>
-                    <input type="number" step="0.01" id="g-current" class="input-dark w-full p-3 rounded-xl" value="0">
-                </div>
-                <button type="submit" class="w-full bg-accent hover:bg-purple-600 text-white font-bold p-3 rounded-xl mt-4 transition">Criar</button>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome</label><input type="text" id="g-name" required class="input-dark w-full p-3 rounded-xl"></div>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Meta</label><input type="number" step="0.01" id="g-target" required class="input-dark w-full p-3 rounded-xl"></div>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Saldo Atual</label><input type="number" step="0.01" id="g-current" class="input-dark w-full p-3 rounded-xl" value="0"></div>
+                <button type="submit" class="w-full bg-accent hover:bg-purple-600 text-white font-bold p-3 rounded-xl mt-4">Criar</button>
             </form>
         </div>
     </div>
@@ -313,354 +235,132 @@
     <div id="modal-deposit" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-2xl p-6 relative animate-enter">
             <button onclick="closeModal('modal-deposit')" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="ph-bold ph-x"></i></button>
-            <h3 class="text-lg font-bold mb-4">Adicionar à Caixinha</h3>
+            <h3 class="text-lg font-bold mb-4">Adicionar Valor</h3>
             <p id="deposit-goal-name" class="text-sm text-gray-400 mb-4"></p>
             <input type="hidden" id="deposit-goal-id">
-            <input type="number" id="deposit-amount" class="input-dark w-full p-3 rounded-xl mb-4" placeholder="Valor do aporte">
-            <div class="flex items-center gap-2 mb-4">
-                <input type="checkbox" id="deduct-balance" class="rounded bg-gray-700 border-gray-600 text-primary">
-                <label for="deduct-balance" class="text-xs text-gray-300">Deduzir do saldo principal (como gasto)</label>
-            </div>
+            <input type="number" id="deposit-amount" class="input-dark w-full p-3 rounded-xl mb-4" placeholder="R$ 0,00">
+            <div class="flex items-center gap-2 mb-4"><input type="checkbox" id="deduct-balance" class="rounded bg-gray-700 border-gray-600 text-primary"><label for="deduct-balance" class="text-xs text-gray-300">Tirar do saldo principal</label></div>
             <button onclick="processDeposit()" class="w-full bg-success hover:bg-emerald-600 text-white font-bold p-3 rounded-xl">Confirmar</button>
         </div>
     </div>
 
     <script>
-        // --- 1. CONFIGURAÇÃO & BANCO DE DADOS LOCAL ---
-        let db = {
-            transactions: JSON.parse(localStorage.getItem('nexus_transactions')) || [],
-            goals: JSON.parse(localStorage.getItem('nexus_goals')) || []
-        };
+        let db = { transactions: JSON.parse(localStorage.getItem('nexus_transactions')) || [], goals: JSON.parse(localStorage.getItem('nexus_goals')) || [] };
         let privacyMode = false;
         let charts = { main: null, donut: null };
 
-        // Ao carregar a página
-        window.onload = () => {
-            initDates();
-            updateDashboard();
-            applyFilters(); 
-            renderGoals();
-        };
+        window.onload = () => { initDates(); updateDashboard(); applyFilters(); renderGoals(); };
+        function saveDB() { localStorage.setItem('nexus_transactions', JSON.stringify(db.transactions)); localStorage.setItem('nexus_goals', JSON.stringify(db.goals)); updateDashboard(); applyFilters(); renderGoals(); }
 
-        // Salvar no Navegador
-        function saveDB() {
-            localStorage.setItem('nexus_transactions', JSON.stringify(db.transactions));
-            localStorage.setItem('nexus_goals', JSON.stringify(db.goals));
-            updateDashboard();
-            applyFilters();
-            renderGoals();
+        // --- SISTEMA DE BACKUP JSON ---
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "nexus_backup_" + new Date().toISOString().slice(0,10) + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
         }
 
-        // --- 2. LÓGICA DO DASHBOARD ---
+        function importJSON(event) {
+            const fileObj = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(data.transactions && data.goals) {
+                        db = data;
+                        saveDB();
+                        alert("Backup restaurado com sucesso!");
+                    } else { alert("Arquivo inválido."); }
+                } catch(error) { alert("Erro ao ler arquivo."); }
+            };
+            reader.readAsText(fileObj);
+        }
+
+        // --- LÓGICA CORE ---
         function updateDashboard() {
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-
-            let totalBalance = 0;
-            let monthIncome = 0;
-            let monthExpense = 0;
-            let categoryMap = {};
-            let creditorMap = {}; 
-
-            // Ordena transações (Mais recente primeiro)
-            db.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+            const cm = new Date().getMonth(), cy = new Date().getFullYear();
+            let bal = 0, inc = 0, exp = 0, cats = {}, creds = {};
+            db.transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
             db.transactions.forEach(t => {
-                const val = parseFloat(t.amount);
-                const d = new Date(t.date);
-                
-                // Saldo Total
-                if (t.type === 'income') totalBalance += val;
-                else totalBalance -= val;
-
-                // Métricas do Mês Atual
-                if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-                    if (t.type === 'income') monthIncome += val;
-                    else {
-                        monthExpense += val;
-                        categoryMap[t.category] = (categoryMap[t.category] || 0) + val;
-                        
-                        // Agrupar Credores
-                        const entityName = t.entity ? t.entity.trim() : 'Outros';
-                        creditorMap[entityName] = (creditorMap[entityName] || 0) + val;
-                    }
+                const v = parseFloat(t.amount), d = new Date(t.date);
+                if(t.type === 'income') bal += v; else bal -= v;
+                if(d.getMonth() === cm && d.getFullYear() === cy) {
+                    if(t.type === 'income') inc += v; else { exp += v; cats[t.category] = (cats[t.category]||0) + v; const ent = t.entity ? t.entity.trim() : 'Outros'; creds[ent] = (creds[ent]||0)+v; }
                 }
             });
-
-            // Atualiza HTML
-            document.getElementById('dash-balance').innerText = formatCurrency(totalBalance);
-            document.getElementById('dash-income').innerText = formatCurrency(monthIncome);
-            document.getElementById('dash-expense').innerText = formatCurrency(monthExpense);
+            document.getElementById('dash-balance').innerText = fmt(bal); document.getElementById('dash-income').innerText = fmt(inc); document.getElementById('dash-expense').innerText = fmt(exp);
+            document.getElementById('expense-bar').style.width = inc > 0 ? `${Math.min((exp/inc)*100, 100)}%` : (exp > 0 ? '100%' : '0%');
             
-            // Barra de Progresso (Gastos)
-            const expensePerc = monthIncome > 0 ? Math.min((monthExpense / monthIncome) * 100, 100) : (monthExpense > 0 ? 100 : 0);
-            document.getElementById('expense-bar').style.width = `${expensePerc}%`;
+            const clist = document.getElementById('creditor-list');
+            const sortedC = Object.entries(creds).sort(([,a],[,b])=>b-a).slice(0,10);
+            clist.innerHTML = sortedC.length ? sortedC.map(([n,v],i)=>`<div class="flex justify-between p-2 bg-white/5 rounded border border-white/5"><span class="text-xs text-gray-400">#${i+1} ${n}</span><span class="text-xs font-bold text-danger private-data">${fmt(v)}</span></div>`).join('') : '<p class="text-xs text-gray-500 italic">Sem dados.</p>';
 
-            // Renderizar Lista de Top Credores
-            const sortedCreditors = Object.entries(creditorMap).sort(([,a], [,b]) => b - a).slice(0, 10);
-            const creditorContainer = document.getElementById('creditor-list');
-            if (sortedCreditors.length === 0) {
-                creditorContainer.innerHTML = '<p class="text-xs text-gray-500 italic">Sem gastos registrados este mês.</p>';
-            } else {
-                creditorContainer.innerHTML = sortedCreditors.map(([name, val], index) => `
-                    <div class="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs font-bold text-gray-500 w-4">#${index+1}</span>
-                            <span class="text-sm font-bold text-gray-200 truncate max-w-[120px]">${name}</span>
-                        </div>
-                        <span class="text-sm font-bold text-danger private-data">${formatCurrency(val)}</span>
-                    </div>
-                `).join('');
-            }
-
-            // Lista Recente (Dashboard)
-            const recentHTML = db.transactions.slice(0, 5).map(t => `
-                <div class="p-4 flex justify-between items-center group hover:bg-white/5 transition">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800 border border-white/5 text-xl">
-                            ${getCategoryIcon(t.category)}
-                        </div>
-                        <div>
-                            <p class="font-bold text-sm text-white">${t.description}</p>
-                            <p class="text-[10px] text-gray-400">${t.entity ? t.entity + ' • ' : ''}${formatDate(t.date)}</p>
-                        </div>
-                    </div>
-                    <span class="font-bold text-sm ${t.type === 'income' ? 'text-success' : 'text-white'} private-data">
-                        ${t.type === 'income' ? '+' : '-'} ${formatCurrency(t.amount)}
-                    </span>
-                </div>
-            `).join('');
-            document.getElementById('recent-list').innerHTML = recentHTML;
-
-            updateCharts(db.transactions, categoryMap);
+            const rlist = document.getElementById('recent-list');
+            rlist.innerHTML = db.transactions.slice(0,5).map(t => `<div class="p-4 flex justify-between items-center border-b border-white/5 last:border-0 hover:bg-white/5"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800 border border-white/5">${getCategoryIcon(t.category)}</div><div><p class="font-bold text-sm text-white">${t.description}</p><p class="text-[10px] text-gray-400">${t.entity?t.entity+' • ':''}${fmtDate(t.date)}</p></div></div><span class="font-bold text-sm ${t.type==='income'?'text-success':'text-white'} private-data">${t.type==='income'?'+':'-'} ${fmt(t.amount)}</span></div>`).join('');
+            
+            updateCharts(db.transactions, cats);
             togglePrivacyUI();
         }
 
-        // --- 3. TRANSAÇÕES & CADASTRO ---
-        function addTransaction(e) {
-            e.preventDefault();
-            const t = {
-                id: Date.now(),
-                entity: document.getElementById('t-entity').value,
-                description: document.getElementById('t-desc').value,
-                amount: parseFloat(document.getElementById('t-amount').value),
-                type: document.getElementById('t-type').value,
-                category: document.getElementById('t-cat').value,
-                date: document.getElementById('t-date').value
-            };
-            db.transactions.push(t);
-            saveDB();
-            closeModal('modal-transaction');
-            e.target.reset();
-        }
-
-        function deleteTransaction(id) { 
-            if(confirm('Apagar este registro?')) { 
-                db.transactions = db.transactions.filter(t => t.id !== id); 
-                saveDB(); 
-            } 
-        }
-
-        // --- 4. EXPORTAÇÃO CSV (EXCEL) ---
+        // --- TRANSAÇÕES ---
+        function addTransaction(e) { e.preventDefault(); db.transactions.push({ id: Date.now(), entity: document.getElementById('t-entity').value, description: document.getElementById('t-desc').value, amount: parseFloat(document.getElementById('t-amount').value), type: document.getElementById('t-type').value, category: document.getElementById('t-cat').value, date: document.getElementById('t-date').value }); saveDB(); closeModal('modal-transaction'); e.target.reset(); }
+        function deleteTransaction(id) { if(confirm('Apagar?')) { db.transactions = db.transactions.filter(t => t.id !== id); saveDB(); } }
+        
+        // --- CSV ---
         function exportCSV() {
-            const start = document.getElementById('filter-start').value;
-            const end = document.getElementById('filter-end').value;
-            const type = document.getElementById('filter-type').value;
-
-            const filtered = db.transactions.filter(t => {
-                const d = t.date;
-                return (!start || d >= start) && (!end || d <= end) && (type === 'all' || t.type === type);
-            });
-
-            if (filtered.length === 0) return alert("Nenhum dado para exportar com esses filtros.");
-
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // BOM para acentos
-            csvContent += "Data;Empresa/Credor;Descrição;Categoria;Tipo;Valor\n";
-
-            filtered.forEach(t => {
-                const val = t.amount.toFixed(2).replace('.', ',');
-                const ent = t.entity ? t.entity.replace(/;/g, " ") : "-";
-                csvContent += `${formatDate(t.date)};${ent};${t.description};${t.category};${t.type};${val}\n`;
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `extrato_nexus_${start||'inicio'}_${end||'fim'}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const start = document.getElementById('filter-start').value, end = document.getElementById('filter-end').value, type = document.getElementById('filter-type').value;
+            const filtered = db.transactions.filter(t => (!start || t.date >= start) && (!end || t.date <= end) && (type === 'all' || t.type === type));
+            if(!filtered.length) return alert("Nada para exportar.");
+            let csv = "data:text/csv;charset=utf-8,\uFEFFData;Empresa;Descrição;Categoria;Tipo;Valor\n" + filtered.map(t => `${fmtDate(t.date)};${t.entity||'-'};${t.description};${t.category};${t.type};${t.amount.toFixed(2).replace('.',',')}`).join('\n');
+            const a = document.createElement('a'); a.href = encodeURI(csv); a.download = `extrato_${start||'ini'}_${end||'fim'}.csv`; document.body.appendChild(a); a.click(); a.remove();
         }
 
         function applyFilters() {
-            const start = document.getElementById('filter-start').value;
-            const end = document.getElementById('filter-end').value;
-            const type = document.getElementById('filter-type').value;
-            const filtered = db.transactions.filter(t => {
-                const d = t.date;
-                return (!start || d >= start) && (!end || d <= end) && (type === 'all' || t.type === type);
-            });
-            renderExtractTable(filtered);
-        }
-
-        function renderExtractTable(data) {
-            const tbody = document.getElementById('extract-table-body');
-            const empty = document.getElementById('empty-state');
-            tbody.innerHTML = '';
-
-            if (data.length === 0) {
-                empty.classList.remove('hidden');
-                return;
-            }
-            empty.classList.add('hidden');
-
-            data.forEach(t => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-white/5 transition group border-b border-white/5 last:border-0";
-                tr.innerHTML = `
-                    <td class="p-4 text-gray-300 whitespace-nowrap text-xs md:text-sm">${formatDate(t.date)}</td>
-                    <td class="p-4 font-bold text-white text-xs md:text-sm">${t.entity || '-'}</td>
-                    <td class="p-4 font-medium text-gray-300 text-xs md:text-sm">${t.description}</td>
-                    <td class="p-4 hidden md:table-cell">
-                        <span class="text-xs px-2 py-1 rounded-md bg-white/5 border border-white/10 text-gray-400">
-                            ${t.category}
-                        </span>
-                    </td>
-                    <td class="p-4 text-right font-bold ${t.type === 'income' ? 'text-success' : 'text-gray-200'} private-data text-xs md:text-sm">
-                        ${t.type === 'income' ? '+' : '-'} ${formatCurrency(t.amount)}
-                    </td>
-                    <td class="p-4 text-center">
-                        <button onclick="deleteTransaction(${t.id})" class="text-gray-600 hover:text-danger transition opacity-0 group-hover:opacity-100">
-                            <i class="ph-bold ph-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+            const start = document.getElementById('filter-start').value, end = document.getElementById('filter-end').value, type = document.getElementById('filter-type').value;
+            const filtered = db.transactions.filter(t => (!start || t.date >= start) && (!end || t.date <= end) && (type === 'all' || t.type === type));
+            const tb = document.getElementById('extract-table-body'); tb.innerHTML = filtered.length ? filtered.map(t => `<tr class="hover:bg-white/5 border-b border-white/5 last:border-0"><td class="p-4 text-gray-300 text-xs">${fmtDate(t.date)}</td><td class="p-4 font-bold text-white text-xs">${t.entity||'-'}</td><td class="p-4 font-medium text-gray-300 text-xs">${t.description}</td><td class="p-4 hidden md:table-cell"><span class="text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-gray-400">${t.category}</span></td><td class="p-4 text-right font-bold ${t.type==='income'?'text-success':'text-gray-200'} private-data text-xs">${t.type==='income'?'+':'-'} ${fmt(t.amount)}</td><td class="p-4 text-center"><button onclick="deleteTransaction(${t.id})" class="text-gray-600 hover:text-danger"><i class="ph-bold ph-trash"></i></button></td></tr>`).join('') : '';
+            document.getElementById('empty-state').className = filtered.length ? 'hidden' : 'p-12 text-center text-gray-500';
             togglePrivacyUI();
         }
 
-        // --- 5. CAIXINHAS (METAS) ---
-        function addGoal(e) { 
-            e.preventDefault(); 
-            db.goals.push({ 
-                id: Date.now(), 
-                name: document.getElementById('g-name').value, 
-                target: parseFloat(document.getElementById('g-target').value), 
-                current: parseFloat(document.getElementById('g-current').value)||0 
-            }); 
-            saveDB(); 
-            closeModal('modal-goal'); 
-            e.target.reset(); 
-        }
-        
+        // --- CAIXINHAS (GOALS) ---
+        function openGoalModal() { openModal('modal-goal'); }
+        function addGoal(e) { e.preventDefault(); db.goals.push({ id: Date.now(), name: document.getElementById('g-name').value, target: parseFloat(document.getElementById('g-target').value), current: parseFloat(document.getElementById('g-current').value)||0 }); saveDB(); closeModal('modal-goal'); e.target.reset(); }
         function renderGoals() {
             const c = document.getElementById('goals-grid'); c.innerHTML = '';
             db.goals.forEach(g => {
                 const perc = Math.min((g.current/g.target)*100, 100).toFixed(1);
-                c.innerHTML += `
-                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden flex flex-col justify-between h-full">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent"><i class="ph-fill ph-trophy"></i></div>
-                        <button onclick="deleteGoal(${g.id})" class="text-gray-600 hover:text-danger text-sm"><i class="ph-bold ph-x"></i></button>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-lg text-white mb-1">${g.name}</h4>
-                        <div class="flex items-baseline gap-2 mb-4">
-                            <span class="text-2xl font-bold text-white private-data">${formatCurrency(g.current)}</span>
-                            <span class="text-xs text-gray-500">de ${formatCurrency(g.target)}</span>
-                        </div>
-                        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden mb-4">
-                            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-1000" style="width: ${perc}%"></div>
-                        </div>
-                        <button onclick="openDepositModal(${g.id}, '${g.name}')" class="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold uppercase tracking-wide transition">Adicionar Valor</button>
-                    </div>
-                </div>`;
+                c.innerHTML += `<div class="glass-panel p-6 rounded-2xl relative overflow-hidden flex flex-col justify-between h-full"><div class="flex justify-between items-start mb-4"><div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent"><i class="ph-fill ph-trophy"></i></div><button onclick="deleteGoal(${g.id})" class="text-gray-600 hover:text-danger text-sm"><i class="ph-bold ph-x"></i></button></div><div><h4 class="font-bold text-lg text-white mb-1">${g.name}</h4><div class="flex items-baseline gap-2 mb-4"><span class="text-2xl font-bold text-white private-data">${fmt(g.current)}</span><span class="text-xs text-gray-500">de ${fmt(g.target)}</span></div><div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden mb-4"><div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-1000" style="width: ${perc}%"></div></div><button onclick="openDepositModal(${g.id}, '${g.name}')" class="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold uppercase tracking-wide transition">Adicionar Valor</button></div></div>`;
             });
             togglePrivacyUI();
         }
-        
-        function openDepositModal(id, n) { 
-            document.getElementById('deposit-goal-id').value=id; 
-            document.getElementById('deposit-goal-name').innerText=`Meta: ${n}`; 
-            openModal('modal-deposit'); 
-        }
-        
+        function openDepositModal(id, n) { document.getElementById('deposit-goal-id').value=id; document.getElementById('deposit-goal-name').innerText=`Meta: ${n}`; openModal('modal-deposit'); }
         function processDeposit() {
-            const id=parseInt(document.getElementById('deposit-goal-id').value);
-            const amt=parseFloat(document.getElementById('deposit-amount').value);
-            const deduct=document.getElementById('deduct-balance').checked;
-            
-            if(!amt||amt<=0) return alert("Valor inválido");
-            
+            const id=parseInt(document.getElementById('deposit-goal-id').value), amt=parseFloat(document.getElementById('deposit-amount').value), deduct=document.getElementById('deduct-balance').checked;
+            if(!amt||amt<=0)return alert("Valor inválido");
             const idx=db.goals.findIndex(g=>g.id===id);
-            if(idx>-1){ 
-                db.goals[idx].current+=amt; 
-                if(deduct) {
-                    db.transactions.push({
-                        id:Date.now(), 
-                        entity: 'Eu mesmo (Caixinha)',
-                        description:`Aporte: ${db.goals[idx].name}`, 
-                        amount:amt, 
-                        type:'expense', 
-                        category:'Investimento', 
-                        date:new Date().toISOString().split('T')[0]
-                    });
-                }
-                saveDB(); 
-                closeModal('modal-deposit'); 
-                document.getElementById('deposit-amount').value=''; 
-            }
+            if(idx>-1){ db.goals[idx].current+=amt; if(deduct) db.transactions.push({id:Date.now(), entity: 'Eu (Caixinha)', description:`Aporte: ${db.goals[idx].name}`, amount:amt, type:'expense', category:'Investimento', date:new Date().toISOString().split('T')[0]}); saveDB(); closeModal('modal-deposit'); document.getElementById('deposit-amount').value=''; }
         }
-        function deleteGoal(id) { if(confirm('Excluir caixinha?')) { db.goals = db.goals.filter(g => g.id !== id); saveDB(); } }
+        function deleteGoal(id) { if(confirm('Excluir?')) { db.goals = db.goals.filter(g => g.id !== id); saveDB(); } }
 
-        // --- 6. GRÁFICOS (APEXCHARTS) ---
-        function updateCharts(transactions, categoryData) {
-            // Config Gráfico Principal
-            const optionsMain = {
-                series: [{ name: 'Fluxo', data: db.transactions.slice(0, 15).reverse().map(t => t.type==='income'?t.amount : -t.amount) }],
-                chart: { type: 'area', height: 300, toolbar: { show: false }, background: 'transparent' },
-                colors: ['#6366f1'],
-                stroke: { curve: 'smooth', width: 2 },
-                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 90, 100] } },
-                dataLabels: { enabled: false },
-                grid: { borderColor: 'rgba(255,255,255,0.05)', strokeDashArray: 4 },
-                xaxis: { categories: db.transactions.slice(0,15).reverse().map(t => formatDateShort(t.date)), labels: { style: { colors: '#888' } }, axisBorder: { show: false }, axisTicks: { show: false } },
-                yaxis: { labels: { style: { colors: '#888' } } },
-                theme: { mode: 'dark' }
-            };
-            if(charts.main) charts.main.destroy();
-            charts.main = new ApexCharts(document.querySelector("#chart-main"), optionsMain);
+        // --- CHARTS & UTILS ---
+        function updateCharts(tr, cats) {
+            if(charts.main) charts.main.destroy(); if(charts.donut) charts.donut.destroy();
+            const vals = tr.slice(0,15).reverse().map(t => t.type==='income'?t.amount : -t.amount);
+            charts.main = new ApexCharts(document.querySelector("#chart-main"), { series: [{name:'Fluxo', data:vals}], chart:{type:'area', height:300, toolbar:{show:false}, background:'transparent'}, colors:['#6366f1'], stroke:{curve:'smooth', width:2}, fill:{type:'gradient', gradient:{shadeIntensity:1, opacityFrom:0.4, opacityTo:0.05}}, dataLabels:{enabled:false}, grid:{borderColor:'rgba(255,255,255,0.05)'}, xaxis:{labels:{show:false}, axisBorder:{show:false}, axisTicks:{show:false}}, yaxis:{show:false}, theme:{mode:'dark'} });
             charts.main.render();
-
-            // Config Gráfico Donut
-            const catLabels = Object.keys(categoryData);
-            const catValues = Object.values(categoryData);
-            const optionsDonut = {
-                series: catValues.length ? catValues : [1],
-                labels: catValues.length ? catLabels : ['Sem dados'],
-                chart: { type: 'donut', height: 300, background: 'transparent' },
-                colors: ['#6366f1', '#a855f7', '#ec4899', '#10b981', '#f59e0b', '#3b82f6'],
-                stroke: { show: false },
-                plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'Total', color: '#fff' } } } } },
-                dataLabels: { enabled: false },
-                legend: { position: 'bottom', labels: { colors: '#888' } }
-            };
-            if(charts.donut) charts.donut.destroy();
-            charts.donut = new ApexCharts(document.querySelector("#chart-donut"), optionsDonut);
+            const cvals = Object.values(cats), clabs = Object.keys(cats);
+            charts.donut = new ApexCharts(document.querySelector("#chart-donut"), { series: cvals.length?cvals:[1], labels:cvals.length?clabs:['Vazio'], chart:{type:'donut', height:300, background:'transparent'}, colors:['#6366f1', '#a855f7', '#ec4899', '#10b981', '#f59e0b'], stroke:{show:false}, plotOptions:{pie:{donut:{size:'70%'}}}, dataLabels:{enabled:false}, legend:{position:'bottom', labels:{colors:'#888'}} });
             charts.donut.render();
         }
 
-        // --- 7. UTILITÁRIOS ---
-        function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
-        function formatDate(i) { return i.split('-').reverse().join('/'); }
-        function formatDateShort(i) { return i.split('-').reverse().slice(0,2).join('/'); }
-        function initDates() { const t=new Date(), f=new Date(t.getFullYear(), t.getMonth(), 1); document.getElementById('t-date').value=t.toISOString().split('T')[0]; document.getElementById('filter-start').value=f.toISOString().split('T')[0]; document.getElementById('filter-end').value=t.toISOString().split('T')[0]; }
-        
-        // Navegação
+        function fmt(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        function fmtDate(d) { return d.split('-').reverse().join('/'); }
+        function initDates() { const t=new Date(); document.getElementById('t-date').value=t.toISOString().split('T')[0]; document.getElementById('filter-end').value=t.toISOString().split('T')[0]; document.getElementById('filter-start').value=new Date(t.getFullYear(), t.getMonth(), 1).toISOString().split('T')[0]; }
         function router(v) { document.querySelectorAll('.view-section').forEach(e=>{e.classList.add('hidden');e.classList.remove('animate-enter')}); const a=document.getElementById(`view-${v}`); a.classList.remove('hidden'); void a.offsetWidth; a.classList.add('animate-enter'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('bg-white/5','text-white')); document.getElementById(`btn-${v}`).classList.add('bg-white/5','text-white'); document.getElementById('page-title').innerText={'dashboard':'Visão Geral','extrato':'Extrato','caixinhas':'Metas'}[v]; }
-        
-        // UI Helpers
         function togglePrivacy() { privacyMode=!privacyMode; document.getElementById('eye-icon').className=privacyMode?'ph-fill ph-eye-slash':'ph ph-eye'; togglePrivacyUI(); }
         function togglePrivacyUI() { document.querySelectorAll('.private-data').forEach(e=>privacyMode?e.classList.add('blur-sm'):e.classList.remove('blur-sm')); }
         function triggerDataInput() { document.getElementById('t-date').value=new Date().toISOString().split('T')[0]; openModal('modal-transaction'); }
