@@ -1,559 +1,565 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="dark">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>NEXUS FINANCIAL | V3.5 (Stable)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameZone ENTERPRISE | Official Store</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                fontFamily: { sans: ['Outfit', 'sans-serif'] },
-                extend: {
-                    colors: {
-                        dark: '#050505',
-                        surface: '#121212',
-                        glass: 'rgba(255, 255, 255, 0.03)',
-                        primary: '#6366f1',
-                        accent: '#8b5cf6',
-                        success: '#10b981',
-                        danger: '#ef4444'
-                    }
-                }
-            }
-        }
-    </script>
 
     <style>
-        body { background-color: #050505; color: #e5e5e5; -webkit-tap-highlight-color: transparent; }
-        .glass-panel {
-            background: rgba(18, 18, 18, 0.6);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        /* --- SYSTEM CORE DESIGN --- */
+        :root {
+            --bg-deep: #050505;
+            --bg-surface: #0f0f10;
+            --bg-elevated: #18181b;
+            
+            --primary: #8b5cf6; /* Violeta Vibrante */
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --accent: #10b981; /* Esmeralda */
+            --danger: #ef4444;
+            
+            --text-main: #ffffff;
+            --text-dim: #a1a1aa;
+            
+            --border: 1px solid rgba(255,255,255,0.08);
+            --radius: 12px;
+            --font-display: 'Rajdhani', sans-serif;
+            --font-body: 'Inter', sans-serif;
         }
-        .input-dark {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s ease;
-        }
-        .input-dark:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-            outline: none;
-        }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-enter { animation: fadeIn 0.4s ease-out forwards; }
-        .blur-sm { filter: blur(8px); transition: 0.3s; }
-        .blur-sm:hover { filter: blur(4px); }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; font-family: var(--font-body); }
         
-        /* Checkbox Switch Personalizado */
-        .toggle-checkbox:checked { right: 0; border-color: #6366f1; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #6366f1; }
+        body { 
+            background-color: var(--bg-deep); 
+            color: var(--text-main); 
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        /* --- UI COMPONENTS --- */
+        button { cursor: pointer; transition: 0.2s; font-family: var(--font-body); }
+        
+        .btn-primary {
+            background: var(--primary); color: white; border: none;
+            padding: 12px 24px; border-radius: 8px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--primary-glow); }
+
+        .btn-outline {
+            background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white;
+            padding: 10px 20px; border-radius: 8px; font-weight: 500;
+        }
+        .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.05); }
+
+        .input-field {
+            background: var(--bg-deep); border: 1px solid #333; color: white;
+            padding: 12px 16px; border-radius: 8px; width: 100%; font-size: 0.95rem;
+            transition: 0.3s;
+        }
+        .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2); }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            height: 80px; padding: 0 5%; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(16px);
+            border-bottom: var(--border); position: sticky; top: 0; z-index: 1000;
+        }
+        
+        .brand { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .brand i { color: var(--primary); font-size: 2rem; }
+
+        .nav-user { display: flex; align-items: center; gap: 20px; }
+        .user-chip { 
+            display: flex; align-items: center; gap: 10px; background: var(--bg-elevated); 
+            padding: 6px 12px 6px 6px; border-radius: 50px; border: var(--border); cursor: pointer;
+        }
+        .avatar-circle { width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
+
+        /* --- HERO SLIDER --- */
+        .hero {
+            height: 500px; position: relative; overflow: hidden; margin-bottom: 4rem;
+        }
+        .slide {
+            position: absolute; inset: 0; background-size: cover; background-position: center;
+            opacity: 0; transition: opacity 1s ease; display: flex; align-items: center; padding: 0 5%;
+        }
+        .slide.active { opacity: 1; }
+        .slide::after { content:''; position: absolute; inset: 0; background: linear-gradient(90deg, #050505 10%, rgba(5,5,5,0.7) 60%, transparent 100%); }
+        .slide-content { position: relative; z-index: 2; max-width: 600px; animation: fadeInUp 0.8s ease; }
+        .tag { background: rgba(255,255,255,0.1); backdrop-filter: blur(4px); padding: 5px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .slide-title { font-family: var(--font-display); font-size: 3.5rem; line-height: 1; margin-bottom: 20px; text-transform: uppercase; }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- GRID DE PRODUTOS --- */
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 5%; }
+        .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: var(--border); }
+        .section-title { font-family: var(--font-display); font-size: 2rem; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+        
+        .card {
+            background: var(--bg-surface); border-radius: var(--radius); border: var(--border);
+            overflow: hidden; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
+            display: flex; flex-direction: column;
+        }
+        .card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5); }
+        
+        .card-img-box { height: 200px; position: relative; overflow: hidden; }
+        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .card:hover img { transform: scale(1.1); }
+        
+        .card-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+        .card-cat { color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; }
+        
+        .price-box { margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
+        .price-val { font-size: 1.4rem; font-weight: 700; color: white; }
+        .price-old { font-size: 0.9rem; text-decoration: line-through; color: var(--text-dim); margin-right: 8px; }
+
+        /* --- MODAL SYSTEM (LOGIN & ADMIN) --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+        }
+        .modal-panel {
+            background: #121214; width: 95%; max-width: 480px; padding: 2.5rem;
+            border-radius: 16px; border: var(--border); position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: zoomIn 0.3s ease;
+        }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* --- ADMIN DASHBOARD --- */
+        .admin-dashboard {
+            position: fixed; inset: 0; background: var(--bg-deep); z-index: 3000;
+            display: none; grid-template-columns: 260px 1fr;
+        }
+        .sidebar { background: var(--bg-surface); border-right: var(--border); padding: 2rem; display: flex; flex-direction: column; }
+        .admin-content { padding: 3rem; overflow-y: auto; }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 3rem; }
+        .stat-card { background: var(--bg-elevated); padding: 20px; border-radius: 12px; border: var(--border); }
+        .stat-val { font-size: 2rem; font-weight: bold; font-family: var(--font-display); margin-top: 5px; }
+
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .data-table th { text-align: left; color: var(--text-dim); padding: 15px; border-bottom: var(--border); font-size: 0.85rem; text-transform: uppercase; }
+        .data-table td { padding: 15px; border-bottom: var(--border); color: white; }
+        .data-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* --- TOAST --- */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; background: var(--bg-elevated);
+            border: 1px solid var(--accent); color: white; padding: 15px 25px;
+            border-radius: 8px; display: flex; align-items: center; gap: 10px;
+            transform: translateY(100px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 5000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .toast.show { transform: translateY(0); }
+        .toast i { color: var(--accent); font-size: 1.2rem; }
+
     </style>
 </head>
-<body class="min-h-screen flex overflow-hidden">
+<body>
 
-    <aside class="w-20 lg:w-64 flex-shrink-0 border-r border-white/5 bg-[#0a0a0a] flex flex-col justify-between z-20 transition-all duration-300">
-        <div>
-            <div class="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-white/5">
-                <i class="ph-fill ph-hexagon text-3xl text-primary"></i>
-                <span class="hidden lg:block ml-3 font-bold text-xl tracking-tight">NEXUS<span class="text-primary">.V3</span></span>
-            </div>
-
-            <nav class="mt-8 px-4 space-y-2">
-                <button onclick="router('dashboard')" class="nav-btn w-full flex items-center p-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all group active-nav" id="btn-dashboard">
-                    <i class="ph ph-squares-four text-xl group-hover:text-primary transition-colors"></i>
-                    <span class="hidden lg:block ml-3 text-sm font-medium">Dashboard</span>
-                </button>
-                <button onclick="router('extrato')" class="nav-btn w-full flex items-center p-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all group" id="btn-extrato">
-                    <i class="ph ph-list-dashes text-xl group-hover:text-primary transition-colors"></i>
-                    <span class="hidden lg:block ml-3 text-sm font-medium">Extrato</span>
-                </button>
-                <button onclick="router('caixinhas')" class="nav-btn w-full flex items-center p-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all group" id="btn-caixinhas">
-                    <i class="ph ph-piggy-bank text-xl group-hover:text-primary transition-colors"></i>
-                    <span class="hidden lg:block ml-3 text-sm font-medium">Caixinhas</span>
-                </button>
-            </nav>
+    <nav class="navbar">
+        <div class="brand">
+            <i class="ph-fill ph-game-controller"></i>
+            GameZone PRO
         </div>
         
-        <div class="p-4 border-t border-white/5 space-y-2">
-            <button onclick="triggerDataInput()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white p-3 rounded-xl shadow-lg shadow-indigo-900/20 transition-transform active:scale-95 flex items-center justify-center gap-2 font-bold mb-4">
-                <i class="ph-bold ph-plus"></i> <span class="hidden lg:block text-sm">Lançar</span>
+        <div class="nav-user">
+            <button id="btnAdmin" onclick="openAdminPanel()" style="display:none; color: var(--text-dim); background: transparent; border: 1px solid #333; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem;">
+                <i class="ph-bold ph-gear"></i> DASHBOARD
             </button>
-            <button onclick="exportJSON()" class="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-xs font-bold text-gray-500 hover:bg-white/5 hover:text-white transition uppercase tracking-wide">
-                <i class="ph-bold ph-floppy-disk"></i> <span class="hidden lg:inline">Backup</span>
-            </button>
-            <label class="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-xs font-bold text-gray-500 hover:bg-white/5 hover:text-white transition uppercase tracking-wide cursor-pointer">
-                <i class="ph-bold ph-upload"></i> <span class="hidden lg:inline">Restaurar</span>
-                <input type="file" onchange="importJSON(event)" class="hidden" accept=".json">
-            </label>
-        </div>
-    </aside>
 
-    <main class="flex-1 overflow-y-auto relative bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/10 via-dark to-dark">
-        <header class="sticky top-0 z-10 glass-panel border-b-0 border-white/5 px-8 py-4 flex justify-between items-center">
-            <h2 id="page-title" class="text-2xl font-bold text-white tracking-tight">Visão Geral</h2>
-            <div class="flex items-center gap-4">
-                <button onclick="togglePrivacy()" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition text-gray-400">
-                    <i class="ph ph-eye" id="eye-icon"></i>
+            <div style="position: relative; cursor: pointer;" onclick="checkout()">
+                <i class="ph ph-shopping-cart" style="font-size: 1.6rem; color: white;"></i>
+                <span id="cartCount" style="position: absolute; top: -5px; right: -8px; background: var(--primary); font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">0</span>
+            </div>
+
+            <div id="userArea">
+                <button class="btn-primary" onclick="openModal('authModal')">
+                    <i class="ph-bold ph-user"></i> ENTRAR
                 </button>
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 border border-white/10 flex items-center justify-center font-bold text-xs shadow-inner">EU</div>
             </div>
-        </header>
-
-        <div class="p-4 lg:p-8 pb-32 max-w-7xl mx-auto">
-
-            <div id="view-dashboard" class="view-section animate-enter">
-                
-                <div class="flex items-center justify-center mb-8 gap-6 glass-panel p-3 rounded-2xl w-fit mx-auto border border-indigo-500/30 shadow-lg shadow-indigo-500/10">
-                    <button onclick="changeDashboardMonth(-1)" class="w-10 h-10 rounded-xl hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition"><i class="ph-bold ph-caret-left text-xl"></i></button>
-                    <div class="text-center min-w-[150px]">
-                        <p class="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">RESUMO DE</p>
-                        <h3 id="current-month-display" class="text-xl font-bold text-white uppercase tracking-wide">JANEIRO 2026</h3>
-                    </div>
-                    <button onclick="changeDashboardMonth(1)" class="w-10 h-10 rounded-xl hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition"><i class="ph-bold ph-caret-right text-xl"></i></button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
-                        <div class="absolute -right-6 -top-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all"></div>
-                        <p class="text-sm text-gray-400 font-medium mb-1">Resultado do Mês</p>
-                        <h3 class="text-3xl font-bold text-white private-data" id="dash-balance">R$ 0,00</h3>
-                        <div class="mt-4 flex items-center gap-2 text-xs text-indigo-400 font-medium bg-indigo-500/10 w-fit px-2 py-1 rounded-md"><i class="ph-fill ph-calendar"></i> Balanço Mensal</div>
-                    </div>
-                    <div class="glass-panel p-6 rounded-2xl border-l-4 border-success relative">
-                        <p class="text-sm text-gray-400 font-medium mb-1">Entradas</p>
-                        <h3 class="text-2xl font-bold text-white private-data" id="dash-income">R$ 0,00</h3>
-                    </div>
-                    <div class="glass-panel p-6 rounded-2xl border-l-4 border-danger relative">
-                        <p class="text-sm text-gray-400 font-medium mb-1">Saídas</p>
-                        <h3 class="text-2xl font-bold text-white private-data" id="dash-expense">R$ 0,00</h3>
-                        <div class="mt-4 w-full bg-gray-800 h-1 rounded-full overflow-hidden"><div class="bg-danger h-full" id="expense-bar" style="width: 0%"></div></div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <div class="glass-panel p-6 rounded-2xl lg:col-span-2">
-                        <h4 class="font-bold text-lg mb-6">Fluxo Financeiro (Anual)</h4>
-                        <div id="chart-main" class="w-full h-[300px]"></div>
-                    </div>
-                    <div class="glass-panel p-6 rounded-2xl flex flex-col">
-                        <h4 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="ph-fill ph-storefront text-primary"></i> Top Credores (Mês)</h4>
-                        <div id="creditor-list" class="flex-1 overflow-y-auto custom-scroll space-y-3 max-h-[250px]"></div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="glass-panel p-6 rounded-2xl">
-                        <h4 class="font-bold text-lg mb-6">Categorias (Mês)</h4>
-                        <div id="chart-donut" class="w-full h-[300px] flex items-center justify-center"></div>
-                    </div>
-                    <div class="glass-panel rounded-2xl overflow-hidden">
-                        <div class="p-6 border-b border-white/5 flex justify-between items-center">
-                            <h4 class="font-bold">Recentes neste Mês</h4>
-                            <button onclick="router('extrato')" class="text-xs text-primary font-bold uppercase tracking-wide hover:underline">Ver Todos</button>
-                        </div>
-                        <div id="recent-list" class="divide-y divide-white/5"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-extrato" class="view-section hidden animate-enter">
-                <div class="glass-panel p-6 rounded-2xl mb-6">
-                    <div class="flex flex-col md:flex-row gap-4 justify-between items-end">
-                        <div class="flex flex-col md:flex-row gap-4 w-full">
-                            <div class="flex-1"><label class="text-xs text-gray-500 font-bold uppercase mb-1 block">De</label><input type="date" id="filter-start" class="input-dark w-full p-2.5 rounded-lg text-sm" onchange="applyFilters()"></div>
-                            <div class="flex-1"><label class="text-xs text-gray-500 font-bold uppercase mb-1 block">Até</label><input type="date" id="filter-end" class="input-dark w-full p-2.5 rounded-lg text-sm" onchange="applyFilters()"></div>
-                            <div class="flex-1"><label class="text-xs text-gray-500 font-bold uppercase mb-1 block">Tipo</label><select id="filter-type" class="input-dark w-full p-2.5 rounded-lg text-sm" onchange="applyFilters()"><option value="all">Todos</option><option value="income">Entradas</option><option value="expense">Saídas</option></select></div>
-                        </div>
-                        <button onclick="exportCSV()" class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold border border-white/10 flex items-center gap-2 transition whitespace-nowrap shadow-lg"><i class="ph-bold ph-download-simple"></i> Baixar CSV</button>
-                    </div>
-                </div>
-
-                <div class="glass-panel rounded-2xl overflow-hidden overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-white/5 text-gray-400 text-xs uppercase tracking-wider border-b border-white/5">
-                                <th class="p-4 font-semibold">Data</th>
-                                <th class="p-4 font-semibold">Credor</th>
-                                <th class="p-4 font-semibold">Descrição</th>
-                                <th class="p-4 font-semibold">Categoria</th>
-                                <th class="p-4 font-semibold text-right">Valor</th>
-                                <th class="p-4 font-semibold text-center">Del</th>
-                            </tr>
-                        </thead>
-                        <tbody id="extract-table-body" class="text-sm divide-y divide-white/5"></tbody>
-                    </table>
-                    <div id="empty-state" class="hidden p-12 text-center text-gray-500"><p>Nenhum registro encontrado.</p></div>
-                </div>
-            </div>
-
-            <div id="view-caixinhas" class="view-section hidden animate-enter">
-                <div class="flex justify-between items-center mb-6">
-                    <p class="text-gray-400 text-sm">Metas Financeiras</p>
-                    <button onclick="openGoalModal()" class="text-primary text-sm font-bold hover:underline">+ Nova</button>
-                </div>
-                <div id="goals-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
-            </div>
-
         </div>
+    </nav>
+
+    <div class="hero">
+        <div class="slide active" style="background-image: url('https://image.api.playstation.com/vulcan/ap/rnd/202312/0117/1c6b12973e4b7754c502b851.png');">
+            <div class="slide-content">
+                <span class="tag">Destaque da Semana</span>
+                <h1 class="slide-title">GTA VI: O Novo Mundo</h1>
+                <p style="color: #ccc; margin-bottom: 25px; font-size: 1.1rem; line-height: 1.6;">Garanta sua reserva com bônus exclusivos. O lançamento mais aguardado da década chegou na GameZone.</p>
+                <button class="btn-primary">VER DETALHES</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="container">
+        <div class="section-header">
+            <h2 class="section-title">Catálogo Oficial</h2>
+        </div>
+        
+        <div class="grid" id="productGrid">
+            </div>
     </main>
 
-    <div id="modal-transaction" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-indigo-500/20 shadow-2xl relative animate-enter">
-            <button onclick="closeModal('modal-transaction')" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="ph-bold ph-x"></i></button>
-            <h3 class="text-xl font-bold mb-6 text-white">Novo Lançamento</h3>
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-panel">
+            <button onclick="closeModal('authModal')" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #666; font-size: 1.5rem;"><i class="ph ph-x"></i></button>
             
-            <form id="form-transaction" onsubmit="addTransaction(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Empresa / Credor</label>
-                    <input type="text" id="t-entity" class="input-dark w-full p-3 rounded-xl border-l-4 border-l-primary" placeholder="Ex: Nubank, Mercado Livre">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Descrição</label>
-                    <input type="text" id="t-desc" required class="input-dark w-full p-3 rounded-xl">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Valor Total</label>
-                        <input type="number" step="0.01" id="t-amount" required class="input-dark w-full p-3 rounded-xl">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo</label>
-                        <select id="t-type" class="input-dark w-full p-3 rounded-xl" onchange="toggleInstallmentOption()">
-                            <option value="expense">💸 Saída</option>
-                            <option value="income">💰 Entrada</option>
-                        </select>
-                    </div>
-                </div>
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <i class="ph-fill ph-user-circle" style="font-size: 3rem; color: var(--primary);"></i>
+                <h2 style="margin-top: 10px;">Acesso GameZone</h2>
+            </div>
 
-                <div id="installment-wrapper" class="bg-white/5 p-3 rounded-xl border border-white/5">
-                    <div class="flex items-center justify-between">
-                        <label for="is-installment" class="text-sm font-bold text-gray-300">É parcelado?</label>
-                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                            <input type="checkbox" name="toggle" id="is-installment" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" onclick="toggleInstallmentInput()"/>
-                            <label for="is-installment" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-700 cursor-pointer"></label>
-                        </div>
-                    </div>
-                    <div id="installment-inputs" class="hidden mt-3">
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nº de Parcelas</label>
-                        <input type="number" id="t-installments" class="input-dark w-full p-2 rounded-lg text-sm" min="2" value="2" placeholder="Ex: 10">
-                        <p class="text-[10px] text-gray-400 mt-1">O valor será dividido automaticamente.</p>
-                    </div>
+            <div id="loginView">
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <input type="email" id="loginEmail" class="input-field" placeholder="E-mail de acesso">
+                    <input type="password" id="loginPass" class="input-field" placeholder="Sua senha">
+                    <button class="btn-primary" style="width: 100%;" onclick="login()">ENTRAR NA CONTA</button>
                 </div>
+                <p style="text-align: center; margin-top: 20px; color: var(--text-dim); font-size: 0.9rem;">
+                    Novo por aqui? <a href="#" onclick="toggleAuth('register')" style="color: white;">Criar conta</a>
+                </p>
+            </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Categoria</label>
-                    <select id="t-cat" class="input-dark w-full p-3 rounded-xl"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Moradia">Moradia</option><option value="Salário">Salário</option><option value="Investimento">Investimento</option><option value="Contas">Contas</option><option value="Cartão">Cartão de Crédito</option><option value="Outros">Outros</option></select>
+            <div id="registerView" style="display: none;">
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <input type="text" id="regName" class="input-field" placeholder="Nome Completo">
+                    <input type="text" id="regCpf" class="input-field" placeholder="CPF (apenas números)">
+                    <input type="text" id="regPhone" class="input-field" placeholder="WhatsApp (com DDD)">
+                    <input type="email" id="regEmail" class="input-field" placeholder="E-mail">
+                    <input type="password" id="regPass" class="input-field" placeholder="Criar senha">
+                    <button class="btn-primary" style="width: 100%;" onclick="register()">CRIAR E ENTRAR</button>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Data (1ª Parcela)</label>
-                    <input type="date" id="t-date" required class="input-dark w-full p-3 rounded-xl">
-                </div>
-                
-                <button type="submit" class="w-full bg-primary hover:bg-indigo-600 text-white font-bold p-3 rounded-xl mt-4">Confirmar Lançamento</button>
-            </form>
+                <p style="text-align: center; margin-top: 20px; color: var(--text-dim); font-size: 0.9rem;">
+                    Já tem conta? <a href="#" onclick="toggleAuth('login')" style="color: white;">Fazer login</a>
+                </p>
+            </div>
         </div>
     </div>
 
-    <div id="modal-goal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative animate-enter">
-            <button onclick="closeModal('modal-goal')" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="ph-bold ph-x"></i></button>
-            <h3 class="text-xl font-bold mb-6 text-white">Nova Caixinha</h3>
-            <form id="form-goal" onsubmit="addGoal(event)" class="space-y-4">
-                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome</label><input type="text" id="g-name" required class="input-dark w-full p-3 rounded-xl"></div>
-                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Meta</label><input type="number" step="0.01" id="g-target" required class="input-dark w-full p-3 rounded-xl"></div>
-                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Saldo Atual</label><input type="number" step="0.01" id="g-current" class="input-dark w-full p-3 rounded-xl" value="0"></div>
-                <button type="submit" class="w-full bg-accent hover:bg-purple-600 text-white font-bold p-3 rounded-xl mt-4">Criar</button>
-            </form>
+    <div class="admin-dashboard" id="adminDashboard">
+        <div class="sidebar">
+            <div class="brand" style="margin-bottom: 3rem; font-size: 1.4rem;">
+                <i class="ph-fill ph-game-controller"></i> GZ Admin
+            </div>
+            <nav style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn-outline" style="border: none; text-align: left; background: rgba(255,255,255,0.05); color: white;">
+                    <i class="ph ph-squares-four"></i> Produtos
+                </button>
+                <button class="btn-outline" style="border: none; text-align: left; color: #666;">
+                    <i class="ph ph-users"></i> Clientes (Em breve)
+                </button>
+            </nav>
+            <button onclick="closeAdminPanel()" style="margin-top: auto; background: none; border: 1px solid #333; color: #666; padding: 10px; border-radius: 8px;">
+                Voltar pra Loja
+            </button>
+        </div>
+        
+        <div class="admin-content">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
+                <h1>Gestão de Produtos</h1>
+                <button class="btn-primary" onclick="openProductEdit()">
+                    <i class="ph-bold ph-plus"></i> NOVO PRODUTO
+                </button>
+            </div>
+
+            <div id="editForm" style="background: var(--bg-surface); padding: 20px; border-radius: 12px; border: var(--border); margin-bottom: 2rem; display: none;">
+                <h3 style="margin-bottom: 15px;">Editar / Criar</h3>
+                <input type="hidden" id="editId">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <input id="editName" class="input-field" placeholder="Nome do Produto">
+                    <input id="editPrice" type="number" class="input-field" placeholder="Preço (R$)">
+                    <input id="editImg" class="input-field" placeholder="URL da Imagem">
+                    <select id="editTag" class="input-field" style="background: var(--bg-deep);">
+                        <option value="">Sem Tag</option>
+                        <option value="NOVIDADE">NOVIDADE</option>
+                        <option value="OFERTA">OFERTA</option>
+                    </select>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn-primary" onclick="saveProduct()">SALVAR</button>
+                    <button class="btn-outline" onclick="document.getElementById('editForm').style.display='none'">CANCELAR</button>
+                </div>
+            </div>
+
+            <div style="background: var(--bg-surface); border-radius: 12px; border: var(--border); overflow: hidden;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Produto</th>
+                            <th>Preço</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTable">
+                        </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div id="modal-deposit" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-sm rounded-2xl p-6 relative animate-enter">
-            <button onclick="closeModal('modal-deposit')" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="ph-bold ph-x"></i></button>
-            <h3 class="text-lg font-bold mb-4">Adicionar Valor</h3>
-            <p id="deposit-goal-name" class="text-sm text-gray-400 mb-4"></p>
-            <input type="hidden" id="deposit-goal-id">
-            <input type="number" id="deposit-amount" class="input-dark w-full p-3 rounded-xl mb-4" placeholder="R$ 0,00">
-            <div class="flex items-center gap-2 mb-4"><input type="checkbox" id="deduct-balance" class="rounded bg-gray-700 border-gray-600 text-primary"><label for="deduct-balance" class="text-xs text-gray-300">Tirar do saldo principal</label></div>
-            <button onclick="processDeposit()" class="w-full bg-success hover:bg-emerald-600 text-white font-bold p-3 rounded-xl">Confirmar</button>
-        </div>
+    <div id="toast" class="toast">
+        <i class="ph-fill ph-check-circle"></i>
+        <span id="toastMsg">Mensagem</span>
     </div>
 
     <script>
-        // --- 1. CONFIGURAÇÃO & ESTADO ---
-        // Voltando para a variável 'let db' simples que você tinha antes
-        let db = { transactions: JSON.parse(localStorage.getItem('nexus_transactions')) || [], goals: JSON.parse(localStorage.getItem('nexus_goals')) || [] };
-        let state = { 
-            privacyMode: false,
-            currentViewDate: new Date()
-        };
-        let charts = { main: null, donut: null };
-        const monthsStr = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        // --- CONFIGURAÇÃO ---
+        const WHATSAPP = "5571991444333";
 
-        window.onload = () => { initDates(); updateDashboard(); applyFilters(); renderGoals(); };
-        function saveDB() { localStorage.setItem('nexus_transactions', JSON.stringify(db.transactions)); localStorage.setItem('nexus_goals', JSON.stringify(db.goals)); updateDashboard(); applyFilters(); renderGoals(); }
+        // --- DATABASE INICIAL ---
+        const defaultDb = [
+            { id: 1, name: 'GTA VI (Reserva)', price: 350, img: 'https://image.api.playstation.com/vulcan/ap/rnd/202312/0117/1c6b12973e4b7754c502b851.png', tag: 'NOVIDADE' },
+            { id: 2, name: 'Elden Ring', price: 249.90, img: 'https://image.api.playstation.com/vulcan/ap/rnd/202202/2816/mYn2ETBTFzwp1g5AJUprO05F.jpg', tag: 'OFERTA' },
+            { id: 3, name: 'PSN Gift Card 100', price: 100, img: 'https://gmedia.playstation.com/is/image/SIEPDC/ps-store-gift-card-image-block-01-en-27aug24?$1600px$', tag: '' },
+            { id: 4, name: 'Xbox Game Pass', price: 49.90, img: 'https://assets.xboxservices.com/assets/0b/1f/0b1f148e-f1cb-465d-b088-720613292416.jpg?n=Xbox-Game-Pass-Ultimate_Image-Card_Campaign_740x417.jpg', tag: '' }
+        ];
 
-        // --- 2. DASHBOARD COM NAVEGAÇÃO DE MÊS ---
-        function changeDashboardMonth(dir) {
-            state.currentViewDate.setMonth(state.currentViewDate.getMonth() + dir);
-            updateDashboard();
+        // --- STATE ---
+        let products = JSON.parse(localStorage.getItem('gz_products')) || defaultDb;
+        let cart = [];
+        let user = JSON.parse(localStorage.getItem('gz_user_session')) || null;
+
+        // --- INIT ---
+        window.onload = () => {
+            renderStore();
+            checkSession();
         }
 
-        function updateDashboard() {
-            const viewMonth = state.currentViewDate.getMonth();
-            const viewYear = state.currentViewDate.getFullYear();
+        // --- STORE LOGIC ---
+        function renderStore() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = products.map(p => `
+                <div class="card">
+                    <div class="card-img-box">
+                        ${p.tag ? `<div style="position:absolute; top:10px; right:10px; background:var(--primary); padding:4px 8px; font-size:0.7rem; font-weight:bold; border-radius:4px;">${p.tag}</div>` : ''}
+                        <img src="${p.img}" alt="${p.name}">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-cat">Digital Key</div>
+                        <h3 class="card-title">${p.name}</h3>
+                        <div class="price-box">
+                            <span class="price-val">R$ ${parseFloat(p.price).toFixed(2)}</span>
+                            <button class="btn-primary" style="padding: 8px 16px;" onclick="addToCart(${p.id})">
+                                <i class="ph-bold ph-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-            // Atualiza Título do Mês
-            document.getElementById('current-month-display').innerText = `${monthsStr[viewMonth]} ${viewYear}`;
+        function addToCart(id) {
+            const p = products.find(x => x.id === id);
+            cart.push(p);
+            document.getElementById('cartCount').innerText = cart.length;
+            showToast(`${p.name} adicionado!`);
+        }
 
-            let bal = 0, inc = 0, exp = 0, cats = {}, creds = {};
+        function checkout() {
+            if(cart.length === 0) return showToast('Seu carrinho está vazio');
+            if(!user) {
+                openModal('authModal');
+                return showToast('Faça login para continuar');
+            }
 
-            // Ordena
-            db.transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-            db.transactions.forEach(t => {
-                const val = parseFloat(t.amount), d = new Date(t.date);
-                
-                // Filtro do Mês para Dashboard
-                if(d.getMonth() === viewMonth && d.getFullYear() === viewYear) {
-                    if(t.type === 'income') {
-                        bal += val; 
-                        inc += val; 
-                    } else { 
-                        bal -= val; 
-                        exp += val; 
-                        cats[t.category] = (cats[t.category]||0) + val; 
-                        const ent = t.entity ? t.entity.trim() : 'Outros'; 
-                        creds[ent] = (creds[ent]||0)+val; 
-                    }
-                }
+            // Generate WhatsApp Link
+            let msg = `*PEDIDO OFICIAL - GAMEZONE PRO*\n`;
+            msg += `👤 Cliente: ${user.name}\n`;
+            msg += `📄 CPF: ${user.cpf}\n`;
+            msg += `--------------------------\n`;
+            
+            let total = 0;
+            cart.forEach(i => {
+                msg += `🎮 ${i.name} - R$ ${i.price}\n`;
+                total += parseFloat(i.price);
             });
-
-            // UI
-            document.getElementById('dash-balance').innerText = fmt(bal);
-            if(bal < 0) document.getElementById('dash-balance').classList.add('text-danger');
-            else document.getElementById('dash-balance').classList.remove('text-danger');
-
-            document.getElementById('dash-income').innerText = fmt(inc);
-            document.getElementById('dash-expense').innerText = fmt(exp);
-            document.getElementById('expense-bar').style.width = inc > 0 ? `${Math.min((exp/inc)*100, 100)}%` : (exp > 0 ? '100%' : '0%');
             
-            // Credores
-            const clist = document.getElementById('creditor-list');
-            const sortedC = Object.entries(creds).sort(([,a],[,b])=>b-a).slice(0,10);
-            clist.innerHTML = sortedC.length ? sortedC.map(([n,v],i)=>`<div class="flex justify-between p-2 bg-white/5 rounded border border-white/5"><span class="text-xs text-gray-400">#${i+1} ${n}</span><span class="text-xs font-bold text-danger private-data">${fmt(v)}</span></div>`).join('') : '<p class="text-xs text-gray-500 italic">Sem dados neste mês.</p>';
+            msg += `\n💰 *TOTAL: R$ ${total.toFixed(2)}*`;
+            msg += `\n_Aguardo chave PIX para pagamento._`;
 
-            // Recentes (Filtrado pelo mês tbm)
-            const recentMonthData = db.transactions.filter(t => {
-                const d = new Date(t.date);
-                return d.getMonth() === viewMonth && d.getFullYear() === viewYear;
-            }).slice(0, 5);
-
-            const rlist = document.getElementById('recent-list');
-            rlist.innerHTML = recentMonthData.length ? recentMonthData.map(t => `<div class="p-4 flex justify-between items-center border-b border-white/5 last:border-0 hover:bg-white/5"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800 border border-white/5">${getCategoryIcon(t.category)}</div><div><p class="font-bold text-sm text-white">${t.description}</p><p class="text-[10px] text-gray-400">${t.entity?t.entity+' • ':''}${fmtDate(t.date)}</p></div></div><span class="font-bold text-sm ${t.type==='income'?'text-success':'text-white'} private-data">${t.type==='income'?'+':'-'} ${fmt(t.amount)}</span></div>`).join('') : '<p class="p-4 text-xs text-gray-500 text-center">Nenhuma movimentação.</p>';
+            window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
             
-            updateCharts(db.transactions, cats); // Gráfico Anual vs Mensal (categorias)
-            togglePrivacyUI();
+            cart = [];
+            document.getElementById('cartCount').innerText = 0;
         }
 
-        // --- 3. LANÇAMENTOS E PARCELAMENTO (CORRIGIDO PARA O SEU PROBLEMA) ---
-        function toggleInstallmentOption() {
-            const type = document.getElementById('t-type').value;
-            const wrap = document.getElementById('installment-wrapper');
-            if(type === 'income') {
-                wrap.classList.add('hidden');
-                document.getElementById('is-installment').checked = false;
-                toggleInstallmentInput();
+        // --- AUTH SYSTEM ---
+        function toggleAuth(view) {
+            document.getElementById('loginView').style.display = view === 'login' ? 'block' : 'none';
+            document.getElementById('registerView').style.display = view === 'register' ? 'block' : 'none';
+        }
+
+        function register() {
+            const name = document.getElementById('regName').value;
+            const cpf = document.getElementById('regCpf').value;
+            const email = document.getElementById('regEmail').value;
+            const pass = document.getElementById('regPass').value;
+
+            if(!name || !email || !pass) return showToast('Preencha todos os campos');
+
+            const newUser = { name, cpf, email, pass, role: 'user' };
+            localStorage.setItem('gz_db_' + email, JSON.stringify(newUser));
+            
+            // Auto Login
+            localStorage.setItem('gz_user_session', JSON.stringify(newUser));
+            user = newUser;
+            checkSession();
+            closeModal('authModal');
+            showToast('Conta criada com sucesso!');
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+
+            // Admin Backdoor
+            if(email === 'admin@gz.com' && pass === 'admin') {
+                const admin = { name: 'Administrador', role: 'admin' };
+                localStorage.setItem('gz_user_session', JSON.stringify(admin));
+                user = admin;
+                checkSession();
+                closeModal('authModal');
+                return showToast('Bem-vindo, Chefe!');
+            }
+
+            const saved = JSON.parse(localStorage.getItem('gz_db_' + email));
+            if(saved && saved.pass === pass) {
+                localStorage.setItem('gz_user_session', JSON.stringify(saved));
+                user = saved;
+                checkSession();
+                closeModal('authModal');
+                showToast(`Olá, ${saved.name}`);
             } else {
-                wrap.classList.remove('hidden');
+                showToast('Email ou senha incorretos');
             }
         }
 
-        function toggleInstallmentInput() {
-            const chk = document.getElementById('is-installment').checked;
-            const div = document.getElementById('installment-inputs');
-            if(chk) div.classList.remove('hidden'); else div.classList.add('hidden');
-        }
+        function checkSession() {
+            const area = document.getElementById('userArea');
+            const adminBtn = document.getElementById('btnAdmin');
 
-        function addTransaction(e) {
-            e.preventDefault();
-            
-            const entity = document.getElementById('t-entity').value;
-            const desc = document.getElementById('t-desc').value;
-            const totalAmount = parseFloat(document.getElementById('t-amount').value);
-            const type = document.getElementById('t-type').value;
-            const cat = document.getElementById('t-cat').value;
-            const dateStr = document.getElementById('t-date').value;
-            const isInstallment = document.getElementById('is-installment').checked;
-            const installments = isInstallment ? parseInt(document.getElementById('t-installments').value) : 1;
-
-            if (isInstallment && type === 'expense' && installments > 1) {
-                // LÓGICA DE PARCELAMENTO CORRIGIDA COM GRUPO
-                const installmentValue = parseFloat((totalAmount / installments).toFixed(2));
-                const baseDate = new Date(dateStr);
-                const groupId = Date.now().toString(); // ID do Grupo
-
-                for (let i = 0; i < installments; i++) {
-                    const nextDate = new Date(baseDate);
-                    nextDate.setMonth(baseDate.getMonth() + i);
-                    const finalDateStr = nextDate.toISOString().split('T')[0];
-
-                    db.transactions.push({
-                        id: Date.now() + i,
-                        groupId: groupId, // Vincula todas
-                        entity: entity,
-                        description: `${desc} (${i+1}/${installments})`,
-                        amount: installmentValue,
-                        type: type,
-                        category: cat,
-                        date: finalDateStr
-                    });
-                }
-                alert(`Sucesso! ${installments} parcelas geradas.`);
+            if(user) {
+                // Logged In UI
+                area.innerHTML = `
+                    <div class="user-chip" onclick="logout()">
+                        <div class="avatar-circle">${user.name[0]}</div>
+                        <span style="font-size:0.9rem; font-weight:500;">${user.name.split(' ')[0]}</span>
+                        <i class="ph-bold ph-sign-out" style="color:#666; font-size:0.9rem;"></i>
+                    </div>
+                `;
+                if(user.role === 'admin') adminBtn.style.display = 'block';
             } else {
-                db.transactions.push({ 
-                    id: Date.now(), 
-                    entity: entity, 
-                    description: desc, 
-                    amount: totalAmount, 
-                    type: type, 
-                    category: cat, 
-                    date: dateStr 
-                });
+                // Logged Out UI
+                area.innerHTML = `<button class="btn-primary" onclick="openModal('authModal')"><i class="ph-bold ph-user"></i> ENTRAR</button>`;
+                adminBtn.style.display = 'none';
             }
-
-            saveDB();
-            closeModal('modal-transaction');
-            e.target.reset();
-            document.getElementById('is-installment').checked = false;
-            toggleInstallmentInput();
         }
 
-        // --- LIXEIRA INTELIGENTE (CORRIGE O PROBLEMA DOS ANTIGOS E NOVOS) ---
-        function deleteTransaction(id) { 
-            const tx = db.transactions.find(t => t.id === id);
-            if (!tx) return;
+        function logout() {
+            localStorage.removeItem('gz_user_session');
+            user = null;
+            checkSession();
+            showToast('Você saiu da conta');
+            window.location.reload();
+        }
 
-            // 1. Se for Lançamento NOVO (tem groupId), apaga o grupo.
-            if (tx.groupId) {
-                if(confirm('Este item é parcelado. Apagar TODAS as parcelas restantes?')) {
-                    db.transactions = db.transactions.filter(t => t.groupId !== tx.groupId);
-                    saveDB();
-                }
-                return;
-            } 
-            
-            // 2. Se for Lançamento ANTIGO (Xbox 2/12...), procura pelo nome.
-            const isLegacyInstallment = tx.description.match(/(.*?) \(\d+\/\d+\)$/);
-            
-            if (isLegacyInstallment) {
-                const baseName = isLegacyInstallment[1]; // Pega o nome "limpo" (ex: Xbox Series S)
-                
-                const similarItems = db.transactions.filter(t => 
-                    t.description.includes(baseName) && 
-                    t.description.includes('(') && 
-                    t.description.includes(')') &&
-                    t.entity === tx.entity
-                );
+        // --- ADMIN SYSTEM ---
+        function openAdminPanel() {
+            document.getElementById('adminDashboard').style.display = 'grid';
+            renderAdminTable();
+        }
+        function closeAdminPanel() {
+            document.getElementById('adminDashboard').style.display = 'none';
+            renderStore(); // Refresh visual
+        }
+        
+        function renderAdminTable() {
+            const tbody = document.getElementById('adminTable');
+            tbody.innerHTML = products.map(p => `
+                <tr>
+                    <td>#${p.id}</td>
+                    <td style="display:flex; align-items:center; gap:10px;">
+                        <img src="${p.img}" style="width:40px; height:40px; border-radius:4px; object-fit:cover;">
+                        ${p.name}
+                    </td>
+                    <td>R$ ${p.price}</td>
+                    <td>
+                        <button onclick="editProduct(${p.id})" style="background:none; border:none; color:var(--primary); margin-right:10px;"><i class="ph-bold ph-pencil-simple"></i></button>
+                        <button onclick="deleteProduct(${p.id})" style="background:none; border:none; color:var(--danger);"><i class="ph-bold ph-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
 
-                if (similarItems.length > 1) {
-                    if(confirm(`Encontrei ${similarItems.length} parcelas antigas iguais a essa.\nDeseja apagar TODAS agora?`)) {
-                        const idsToDelete = similarItems.map(t => t.id);
-                        db.transactions = db.transactions.filter(t => !idsToDelete.includes(t.id));
-                        saveDB();
-                        return;
-                    }
-                }
+        function openProductEdit() {
+            document.getElementById('editForm').style.display = 'block';
+            // Clear fields
+            document.getElementById('editId').value = '';
+            document.getElementById('editName').value = '';
+            document.getElementById('editPrice').value = '';
+            document.getElementById('editImg').value = '';
+        }
+
+        function saveProduct() {
+            const id = document.getElementById('editId').value;
+            const name = document.getElementById('editName').value;
+            const price = document.getElementById('editPrice').value;
+            const img = document.getElementById('editImg').value;
+            const tag = document.getElementById('editTag').value;
+
+            if(id) {
+                const idx = products.findIndex(p => p.id == id);
+                products[idx] = { ...products[idx], name, price, img, tag };
+            } else {
+                const newId = products.length ? products[products.length-1].id + 1 : 1;
+                products.push({ id: newId, name, price, img, tag });
             }
-
-            // 3. Se for lançamento simples, apaga só ele.
-            if(confirm('Apagar registro?')) { 
-                db.transactions = db.transactions.filter(t => t.id !== id); 
-                saveDB(); 
-            } 
+            
+            localStorage.setItem('gz_products', JSON.stringify(products));
+            renderAdminTable();
+            document.getElementById('editForm').style.display = 'none';
+            showToast('Produto Salvo!');
         }
 
-        // --- 4. BACKUP, EXPORT, FILTROS ---
-        function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-            const a = document.createElement('a'); a.href = dataStr; a.download = "nexus_bkp_" + new Date().toISOString().slice(0,10) + ".json"; document.body.appendChild(a); a.click(); a.remove();
-        }
-        function importJSON(event) {
-            const reader = new FileReader();
-            reader.onload = (e) => { try { db = JSON.parse(e.target.result); saveDB(); alert("Restaurado!"); } catch(err) { alert("Erro!"); } };
-            reader.readAsText(event.target.files[0]);
-        }
-        function exportCSV() {
-            const start = document.getElementById('filter-start').value, end = document.getElementById('filter-end').value, type = document.getElementById('filter-type').value;
-            const filtered = db.transactions.filter(t => (!start || t.date >= start) && (!end || t.date <= end) && (type === 'all' || t.type === type));
-            if(!filtered.length) return alert("Nada para exportar.");
-            let csv = "data:text/csv;charset=utf-8,\uFEFFData;Credor;Descrição;Categoria;Tipo;Valor\n" + filtered.map(t => `${fmtDate(t.date)};${t.entity||'-'};${t.description};${t.category};${t.type};${t.amount.toFixed(2).replace('.',',')}`).join('\n');
-            const a = document.createElement('a'); a.href = encodeURI(csv); a.download = "extrato.csv"; document.body.appendChild(a); a.click(); a.remove();
-        }
-        function applyFilters() {
-            const start = document.getElementById('filter-start').value, end = document.getElementById('filter-end').value, type = document.getElementById('filter-type').value;
-            const filtered = db.transactions.filter(t => (!start || t.date >= start) && (!end || t.date <= end) && (type === 'all' || t.type === type));
-            const tb = document.getElementById('extract-table-body'); tb.innerHTML = filtered.length ? filtered.map(t => `<tr class="hover:bg-white/5 border-b border-white/5 last:border-0"><td class="p-4 text-gray-300 text-xs">${fmtDate(t.date)}</td><td class="p-4 font-bold text-white text-xs">${t.entity||'-'}</td><td class="p-4 font-medium text-gray-300 text-xs">${t.description}</td><td class="p-4 hidden md:table-cell"><span class="text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-gray-400">${t.category}</span></td><td class="p-4 text-right font-bold ${t.type==='income'?'text-success':'text-gray-200'} private-data text-xs">${t.type==='income'?'+':'-'} ${fmt(t.amount)}</td><td class="p-4 text-center"><button onclick="deleteTransaction(${t.id})" class="text-gray-600 hover:text-danger"><i class="ph-bold ph-trash"></i></button></td></tr>`).join('') : '';
-            document.getElementById('empty-state').className = filtered.length ? 'hidden' : 'p-12 text-center text-gray-500';
-            togglePrivacyUI();
+        function editProduct(id) {
+            const p = products.find(x => x.id === id);
+            document.getElementById('editForm').style.display = 'block';
+            document.getElementById('editId').value = p.id;
+            document.getElementById('editName').value = p.name;
+            document.getElementById('editPrice').value = p.price;
+            document.getElementById('editImg').value = p.img;
+            document.getElementById('editTag').value = p.tag;
         }
 
-        // --- 5. CAIXINHAS & OUTROS ---
-        function addGoal(e) { e.preventDefault(); db.goals.push({ id: Date.now(), name: document.getElementById('g-name').value, target: parseFloat(document.getElementById('g-target').value), current: parseFloat(document.getElementById('g-current').value)||0 }); saveDB(); closeModal('modal-goal'); e.target.reset(); }
-        function renderGoals() {
-            const c = document.getElementById('goals-grid'); c.innerHTML = '';
-            db.goals.forEach(g => {
-                const perc = Math.min((g.current/g.target)*100, 100).toFixed(1);
-                c.innerHTML += `<div class="glass-panel p-6 rounded-2xl relative overflow-hidden flex flex-col justify-between h-full"><div class="flex justify-between items-start mb-4"><div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent"><i class="ph-fill ph-trophy"></i></div><button onclick="deleteGoal(${g.id})" class="text-gray-600 hover:text-danger text-sm"><i class="ph-bold ph-x"></i></button></div><div><h4 class="font-bold text-lg text-white mb-1">${g.name}</h4><div class="flex items-baseline gap-2 mb-4"><span class="text-2xl font-bold text-white private-data">${fmt(g.current)}</span><span class="text-xs text-gray-500">de ${fmt(g.target)}</span></div><div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden mb-4"><div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-1000" style="width: ${perc}%"></div></div><button onclick="openDepositModal(${g.id}, '${g.name}')" class="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold uppercase tracking-wide transition">Adicionar Valor</button></div></div>`;
-            });
-            togglePrivacyUI();
-        }
-        function openDepositModal(id, n) { document.getElementById('deposit-goal-id').value=id; document.getElementById('deposit-goal-name').innerText=`Meta: ${n}`; openModal('modal-deposit'); }
-        function processDeposit() {
-            const id=parseInt(document.getElementById('deposit-goal-id').value), amt=parseFloat(document.getElementById('deposit-amount').value), deduct=document.getElementById('deduct-balance').checked;
-            if(!amt||amt<=0)return alert("Valor inválido");
-            const idx=db.goals.findIndex(g=>g.id===id);
-            if(idx>-1){ db.goals[idx].current+=amt; if(deduct) db.transactions.push({id:Date.now(), entity: 'Eu (Caixinha)', description:`Aporte: ${db.goals[idx].name}`, amount:amt, type:'expense', category:'Investimento', date:new Date().toISOString().split('T')[0]}); saveDB(); closeModal('modal-deposit'); document.getElementById('deposit-amount').value=''; }
-        }
-        function deleteGoal(id) { if(confirm('Excluir?')) { db.goals = db.goals.filter(g => g.id !== id); saveDB(); } }
-
-        function updateCharts(tr, cats) {
-            if(charts.main) charts.main.destroy(); if(charts.donut) charts.donut.destroy();
-            const vals = db.transactions.sort((a,b)=> new Date(a.date)-new Date(b.date)).slice(-15).map(t => t.type==='income'?t.amount : -t.amount);
-            charts.main = new ApexCharts(document.querySelector("#chart-main"), { series: [{name:'Fluxo', data:vals}], chart:{type:'area', height:300, toolbar:{show:false}, background:'transparent'}, colors:['#6366f1'], stroke:{curve:'smooth', width:2}, fill:{type:'gradient', gradient:{shadeIntensity:1, opacityFrom:0.4, opacityTo:0.05}}, dataLabels:{enabled:false}, grid:{borderColor:'rgba(255,255,255,0.05)'}, xaxis:{labels:{show:false}, axisBorder:{show:false}, axisTicks:{show:false}}, yaxis:{show:false}, theme:{mode:'dark'} });
-            charts.main.render();
-            const cvals = Object.values(cats), clabs = Object.keys(cats);
-            charts.donut = new ApexCharts(document.querySelector("#chart-donut"), { series: cvals.length?cvals:[1], labels:cvals.length?clabs:['Vazio'], chart:{type:'donut', height:300, background:'transparent'}, colors:['#6366f1', '#a855f7', '#ec4899', '#10b981', '#f59e0b'], stroke:{show:false}, plotOptions:{pie:{donut:{size:'70%'}}}, dataLabels:{enabled:false}, legend:{position:'bottom', labels:{colors:'#888'}} });
-            charts.donut.render();
+        function deleteProduct(id) {
+            if(confirm('Deletar produto?')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('gz_products', JSON.stringify(products));
+                renderAdminTable();
+            }
         }
 
-        // Utils
-        function fmt(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
-        function fmtDate(d) { return d.split('-').reverse().join('/'); }
-        function initDates() { const t=new Date(); document.getElementById('t-date').value=t.toISOString().split('T')[0]; document.getElementById('filter-end').value=t.toISOString().split('T')[0]; document.getElementById('filter-start').value=new Date(t.getFullYear(), t.getMonth(), 1).toISOString().split('T')[0]; }
-        function router(v) { document.querySelectorAll('.view-section').forEach(e=>{e.classList.add('hidden');e.classList.remove('animate-enter')}); const a=document.getElementById(`view-${v}`); a.classList.remove('hidden'); void a.offsetWidth; a.classList.add('animate-enter'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('bg-white/5','text-white')); document.getElementById(`btn-${v}`).classList.add('bg-white/5','text-white'); document.getElementById('page-title').innerText={'dashboard':'Visão Geral','extrato':'Extrato','caixinhas':'Metas'}[v]; }
-        function togglePrivacy() { state.privacyMode=!state.privacyMode; document.getElementById('eye-icon').className=state.privacyMode?'ph-fill ph-eye-slash':'ph ph-eye'; togglePrivacyUI(); }
-        function togglePrivacyUI() { document.querySelectorAll('.private-data').forEach(e=>state.privacyMode?e.classList.add('blur-sm'):e.classList.remove('blur-sm')); }
-        function triggerDataInput() { document.getElementById('t-date').value=new Date().toISOString().split('T')[0]; openModal('modal-transaction'); }
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
-        function getCategoryIcon(c) { return {'Alimentação':'🥗','Transporte':'🚗','Lazer':'🎮','Moradia':'🏠','Salário':'💵','Investimento':'📈','Contas':'💡','Cartão':'💳'}[c]||'🔹'; }
+        // --- UTILS ---
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function showToast(text) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = text;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
     </script>
 </body>
 </html>
