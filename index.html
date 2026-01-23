@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAMEZONE FIREBASE | Realtime Store</title>
+    <title>GAMEZONE FIREBASE | Vendas Loja</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Rajdhani:wght@600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        /* --- CYBER THEME (Mantido idêntico ao aprovado) --- */
+        /* --- CYBER THEME --- */
         :root {
             --bg-deep: #050505;
             --bg-surface: #0f0f12;
@@ -113,7 +113,7 @@
 
     <div id="loader">
         <div class="spinner"></div>
-        <p style="margin-top:15px; font-family:'Rajdhani'; letter-spacing:2px;">CONECTANDO AO FIREBASE...</p>
+        <p style="margin-top:15px; font-family:'Rajdhani'; letter-spacing:2px;">CONECTANDO AO SERVIDOR...</p>
     </div>
 
     <nav class="navbar">
@@ -215,71 +215,77 @@
     <div id="toast" class="toast">AÇÃO REALIZADA</div>
 
     <script type="module">
-        // Importando do CDN do Google
+        // Importando do CDN oficial do Google
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
-        // ⚠️ ATENÇÃO: COLE SUAS CHAVES DO FIREBASE AQUI EMBAIXO ⚠️
+        // SUAS CHAVES REAIS DO PROJETO VENDASLOJA
         const firebaseConfig = {
-            apiKey: "COLE_SUA_API_KEY_AQUI",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJECT_ID",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "NUMEROS...",
-            appId: "1:NUMEROS:web:LETRAS..."
+            apiKey: "AIzaSyBg_HNUeOg51rs0dlU9vEsr0bkxMyJQJTw",
+            authDomain: "vendasloja-9adab.firebaseapp.com",
+            projectId: "vendasloja-9adab",
+            storageBucket: "vendasloja-9adab.firebasestorage.app",
+            messagingSenderId: "245994456944",
+            appId: "1:245994456944:web:49ef41e797da69a45eb1b5",
+            measurementId: "G-2KN0EQD3KX"
         };
 
         // Inicializar Firebase
-        let app, auth, db;
+        let app, auth, db, analytics;
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            document.getElementById('loader').style.display = 'none'; // Esconde loading se der certo
+            analytics = getAnalytics(app);
+            document.getElementById('loader').style.display = 'none'; // Esconde loading
         } catch (e) {
             console.error("Erro Firebase:", e);
-            alert("Erro ao conectar Firebase. Verifique se colou as chaves no código!");
+            document.getElementById('loader').innerHTML = "<p style='color:red'>ERRO DE CONEXÃO. VEJA O CONSOLE.</p>";
         }
 
         // --- VARIAVEIS GLOBAIS ---
         let cart = [];
         let currentUser = null;
         const WHATSAPP = "5571991444333";
-        const ADMIN_EMAIL = "admin@gz.com"; // Email que terá acesso ao painel
+        const ADMIN_EMAIL = "admin@gz.com"; // ⚠️ Crie uma conta com este e-mail para virar admin
 
         // --- SISTEMA DE DADOS (FIRESTORE) ---
         
-        // Carregar Tudo Inicialmente
         async function loadData() {
-            // 1. Carregar Configuração (Logo)
-            const configSnap = await getDoc(doc(db, "settings", "general"));
-            if (configSnap.exists()) {
-                const data = configSnap.data();
-                renderLogo(data.logoUrl);
-                document.getElementById('cfgLogo').value = data.logoUrl || '';
-            } else {
-                renderLogo(null);
-            }
+            try {
+                // 1. Carregar Configuração (Logo)
+                const configSnap = await getDoc(doc(db, "settings", "general"));
+                if (configSnap.exists()) {
+                    const data = configSnap.data();
+                    renderLogo(data.logoUrl);
+                    document.getElementById('cfgLogo').value = data.logoUrl || '';
+                } else {
+                    renderLogo(null);
+                }
 
-            // 2. Carregar Hero (Destaque)
-            const heroSnap = await getDoc(doc(db, "settings", "hero"));
-            if (heroSnap.exists()) {
-                const h = heroSnap.data();
-                updateHeroUI(h);
-                // Preenche inputs do admin
-                document.getElementById('edtTitle').value = h.title;
-                document.getElementById('edtDesc').value = h.desc;
-                document.getElementById('edtBtn').value = h.btn;
-                document.getElementById('edtImg').value = h.img;
-            } else {
-                // Se não existir no banco, cria padrão
-                const defHero = { title:'CYBER WEEK', desc:'Ofertas Cloud.', btn:'VER', img:'https://image.api.playstation.com/vulcan/ap/rnd/202010/0222/b3i275378690673745920255.png' };
-                updateHeroUI(defHero);
-            }
+                // 2. Carregar Hero (Destaque)
+                const heroSnap = await getDoc(doc(db, "settings", "hero"));
+                if (heroSnap.exists()) {
+                    const h = heroSnap.data();
+                    updateHeroUI(h);
+                    document.getElementById('edtTitle').value = h.title;
+                    document.getElementById('edtDesc').value = h.desc;
+                    document.getElementById('edtBtn').value = h.btn;
+                    document.getElementById('edtImg').value = h.img;
+                } else {
+                    // Padrão se banco vazio
+                    const defHero = { title:'BEM-VINDO A VENDAS LOJA', desc:'Ofertas Cloud em Tempo Real.', btn:'VER', img:'https://image.api.playstation.com/vulcan/ap/rnd/202010/0222/b3i275378690673745920255.png' };
+                    updateHeroUI(defHero);
+                }
 
-            // 3. Carregar Produtos
-            refreshProducts();
+                // 3. Carregar Produtos
+                await refreshProducts();
+            } catch (error) {
+                console.error("Erro ao carregar dados:", error);
+                // toast("Erro ao buscar dados (Verifique Regras do Firestore)");
+            }
         }
 
         async function refreshProducts() {
@@ -289,6 +295,10 @@
             
             let htmlGrid = '';
             let htmlAdmin = '';
+
+            if (querySnapshot.empty) {
+                grid.innerHTML = "<p style='padding:20px; color:#666'>Nenhum produto cadastrado ainda. Faça login como Admin para adicionar.</p>";
+            }
 
             querySnapshot.forEach((doc) => {
                 const p = doc.data();
@@ -315,7 +325,7 @@
                 </div>`;
             });
 
-            grid.innerHTML = htmlGrid;
+            if(htmlGrid) grid.innerHTML = htmlGrid;
             adminList.innerHTML = htmlAdmin;
         }
 
@@ -325,7 +335,7 @@
             if (url) {
                 brand.innerHTML = `<img src="${url}" alt="Logo">`;
             } else {
-                brand.innerHTML = `<div class="text-logo"><i class="ph-fill ph-game-controller"></i>GAMEZONE <span>CYBER</span></div>`;
+                brand.innerHTML = `<div class="text-logo"><i class="ph-fill ph-game-controller"></i>VENDAS <span>LOJA</span></div>`;
             }
         }
 
@@ -345,7 +355,7 @@
 
             if (user) {
                 userBtn.innerHTML = `<span style="font-size:0.8rem; margin-right:10px;">${user.email}</span>`;
-                // Check Admin (simples verificação de email)
+                // Check Admin
                 if(user.email === ADMIN_EMAIL) {
                     adminBtn.style.display = 'block';
                 } else {
@@ -355,11 +365,11 @@
                 userBtn.innerHTML = `<button class="btn-cyber" onclick="openModal('authModal')" style="padding: 8px 20px; font-size:0.8rem;">LOGIN</button>`;
                 adminBtn.style.display = 'none';
             }
-            // Carrega dados após auth check
+            // Carrega dados
             loadData();
         });
 
-        // Funções exportadas para o escopo global (para o HTML acessar)
+        // Funções Globais
         window.loginUser = async () => {
             const e = document.getElementById('email').value;
             const p = document.getElementById('pass').value;
@@ -385,12 +395,12 @@
             location.reload();
         };
 
-        // --- ADMIN ACTIONS (Firestore Writes) ---
+        // --- ADMIN ACTIONS ---
         window.saveConfig = async () => {
             const url = document.getElementById('cfgLogo').value;
             await setDoc(doc(db, "settings", "general"), { logoUrl: url });
             renderLogo(url);
-            toast('LOGO SALVA NA NUVEM');
+            toast('LOGO SALVA');
         };
 
         window.saveHero = async () => {
@@ -417,25 +427,25 @@
         };
 
         window.deleteProduct = async (id) => {
-            if(confirm("Apagar este item do banco de dados?")) {
+            if(confirm("Apagar este item?")) {
                 await deleteDoc(doc(db, "products", id));
                 refreshProducts();
                 toast('ITEM APAGADO');
             }
         };
 
-        // --- CARRINHO & INTERFACE ---
+        // --- CARRINHO ---
         window.addToCart = (id, name, price) => {
             cart.push({id, name, price});
             document.getElementById('cartCount').innerText = cart.length;
-            toast('ADICIONADO AO CARRINHO');
+            toast('ADICIONADO');
         };
 
         window.checkout = () => {
             if(!cart.length) return toast('CARRINHO VAZIO');
             if(!currentUser) return openModal('authModal');
 
-            let msg = `*PEDIDO FIREBASE - GZ*\nUSER: ${currentUser.email}\nITENS:\n`;
+            let msg = `*PEDIDO VENDAS LOJA*\nUSER: ${currentUser.email}\nITENS:\n`;
             let total = 0;
             cart.forEach(i => { msg += `- ${i.name} (${i.price})\n`; total+=i.price; });
             msg += `TOTAL: ${total}`;
@@ -449,7 +459,6 @@
             if(l.style.display === 'none') { l.style.display='block'; r.style.display='none'; }
             else { l.style.display='none'; r.style.display='block'; }
         }
-
         window.openModal = (id) => document.getElementById(id).style.display = 'flex';
         window.closeModal = (id) => document.getElementById(id).style.display = 'none';
         window.toggleAdmin = () => {
@@ -460,7 +469,6 @@
         window.showTab = (id) => {
             ['tabProd','tabHero','tabConfig'].forEach(t => document.getElementById(t).style.display='none');
             document.getElementById(id).style.display='block';
-            // Highlight button logic omitted for brevity
         }
         window.toast = (m) => {
             const t = document.getElementById('toast');
